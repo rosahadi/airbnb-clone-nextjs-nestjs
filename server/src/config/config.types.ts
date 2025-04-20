@@ -1,8 +1,14 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as Joi from 'joi';
+import { AuthConfig } from './auth.config';
+import { FrontendConfig } from './frontend.config';
+import { EmailConfig } from './email.config';
 
 export interface ConfigType {
   database: TypeOrmModuleOptions;
+  auth: AuthConfig;
+  frontend: FrontendConfig;
+  email: EmailConfig;
 }
 
 export const appConfigSchema = Joi.object({
@@ -12,5 +18,9 @@ export const appConfigSchema = Joi.object({
   DB_PASSWORD: Joi.string().required(),
   DB_DATABASE: Joi.string().required(),
   DB_SYNC: Joi.number().valid(0, 1).required(),
-  CLERK_SECRET_KEY: Joi.string().required(),
+  JWT_SECRET: Joi.string().required(),
+  JWT_EXPIRES_IN: Joi.string().required(),
+  CLIENT_URL: Joi.string().uri().default('http://localhost:3000'),
+  RESEND_API_KEY: Joi.string().required(),
+  FROM_EMAIL: Joi.string().email().default('Taskard <no-reply@rosah.dev>'),
 });
