@@ -1,0 +1,75 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthResponse {
+  token: String!
+  user: User!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  deleteMe: User!
+  deleteUser(id: ID!): User!
+  forgotPassword(forgotPasswordInput: ForgotPasswordInput!): Boolean!
+  login(loginInput: LoginInput!): AuthResponse!
+  logout: Boolean!
+  resetPassword(resetPasswordInput: ResetPasswordInput!): AuthResponse!
+  signup(signupInput: SignupInput!): AuthResponse!
+  updateMe(updateUserInput: UpdateUserInput!): User!
+  updatePassword(updatePasswordInput: UpdatePasswordInput!): AuthResponse!
+  updateUser(id: ID!, updateUserInput: UpdateUserInput!): User!
+}
+
+type Query {
+  me: User!
+  user(id: ID!): User!
+  users: [User!]!
+}
+
+input ResetPasswordInput {
+  password: String!
+  passwordConfirm: String!
+  token: String!
+}
+
+input SignupInput {
+  email: String!
+  name: String!
+  password: String!
+  passwordConfirm: String!
+}
+
+input UpdatePasswordInput {
+  currentPassword: String!
+  password: String!
+  passwordConfirm: String!
+}
+
+input UpdateUserInput {
+  email: String
+  image: String
+  name: String
+}
+
+type User {
+  createdAt: DateTime!
+  email: String!
+  id: ID!
+  name: String!
+  roles: [String!]!
+  updatedAt: DateTime!
+}

@@ -8,7 +8,15 @@ import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { TypedConfigService } from './config/typed-config.service';
 import { typeOrmConfig } from './config/database.config';
-import { User } from './users/user.entity';
+import { User } from './users/entities/user.entity';
+import { Request } from 'express';
+import { authConfig } from './config/auth.config';
+import { appConfigSchema } from './config/config.types';
+import { frontendConfig } from './config/frontend.config';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { EmailModule } from './email/email.module';
+import { emailConfig } from './config/email.config';
 
 @Module({
   imports: [
@@ -23,7 +31,8 @@ import { User } from './users/user.entity';
 
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [typeOrmConfig],
+      load: [typeOrmConfig, authConfig, frontendConfig, emailConfig],
+      validationSchema: appConfigSchema,
       validationOptions: {
         abortEarly: true,
       },
@@ -34,9 +43,20 @@ import { User } from './users/user.entity';
       graphiql: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
+      context: ({ req }: { req: Request }) => ({ req }),
     }),
+
+    UsersModule,
+    AuthModule,
+    EmailModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: TypedConfigService,
+      useExisting: ConfigService,
+    },
+  ],
 })
 export class AppModule {}
