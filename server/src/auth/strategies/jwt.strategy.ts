@@ -6,10 +6,14 @@ import type { Request } from 'express';
 import { TypedConfigService } from 'src/config/typed-config.service';
 import { UsersService } from '../../users/users.service';
 import { AuthConfig } from 'src/config/auth.config';
+import { Role } from 'src/users/role.enum';
 
 interface JwtPayload {
   sub: string;
   email: string;
+  roles?: Role[];
+  iat?: number;
+  exp?: number;
 }
 
 @Injectable()

@@ -14,6 +14,13 @@ import { EmailService } from '../email/email.service';
 import { User } from '../users/entities/user.entity';
 import { PasswordService } from './password.service';
 
+interface VerificationTokenPayload {
+  email: string;
+  sub: string;
+  iat?: number;
+  exp?: number;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -24,9 +31,7 @@ export class AuthService {
     private passwordService: PasswordService,
   ) {}
 
-  async signup(
-    signupInput: SignupInput,
-  ): Promise<{ token: string; user: User }> {
+  async signup(signupInput: SignupInput): Promise<{ message: string }> {
     // Check if password and passwordConfirm match
     if (signupInput.password !== signupInput.passwordConfirm) {
       throw new BadRequestException('Passwords do not match');
@@ -38,17 +43,74 @@ export class AuthService {
       throw new BadRequestException('Email already in use');
     }
 
-    // Create new user - password hashing is handled in UsersService
+    // Set expiration time for email verification (15 minutes)
+    const expiresDate = new Date();
+    expiresDate.setMinutes(expiresDate.getMinutes() + 15);
+
+    // Create new user with expiration date
     const user = await this.usersService.create({
       name: signupInput.name,
       email: signupInput.email,
       password: signupInput.password,
+      isEmailVerified: false,
+      emailVerificationExpires: expiresDate,
     });
 
-    // Generate JWT token
-    const token = this.generateToken(user);
+    // Generate verification token
+    const verificationToken = this.generateVerificationToken(user);
 
-    return { token, user };
+    // Send verification email
+    await this.emailService.sendVerificationEmail(user, verificationToken);
+
+    return {
+      message: 'Please check your email for verification link',
+    };
+  }
+
+  async verifyEmail(token: string): Promise<{ token: string; user: User }> {
+    try {
+      // Verify and decode the token
+      const decoded = this.jwtService.verify<VerificationTokenPayload>(token);
+
+      // Find user by ID from token
+      const user = await this.usersService.findById(decoded.sub);
+
+      if (!user) {
+        throw new UnauthorizedException('Invalid token');
+      }
+
+      // Check if verification period has expired
+      if (
+        user.emailVerificationExpires &&
+        user.emailVerificationExpires < new Date()
+      ) {
+        // User verification has expired we'll delete the user and throw an exception
+        await this.usersService.remove(user.id);
+        throw new UnauthorizedException(
+          'Verification link has expired. Please sign up again.',
+        );
+      }
+
+      // Update user's email verification status
+      await this.usersService.update(user.id, {
+        isEmailVerified: true,
+        emailVerificationExpires: undefined,
+      });
+
+      // Fetch updated user
+      const updatedUser = await this.usersService.findById(user.id);
+
+      // Generate new token
+      const newToken = this.generateToken(updatedUser);
+
+      return { token: newToken, user: updatedUser };
+    } catch (error) {
+      // Handle specific error for expired token
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 
   async login(loginInput: LoginInput): Promise<{ token: string; user: User }> {
@@ -157,5 +219,12 @@ export class AuthService {
   private generateToken(user: User): string {
     const payload = { email: user.email, sub: user.id, roles: user.roles };
     return this.jwtService.sign(payload);
+  }
+
+  private generateVerificationToken(user: User): string {
+    const payload = { email: user.email, sub: user.id };
+    return this.jwtService.sign(payload, {
+      expiresIn: '15m',
+    });
   }
 }

@@ -52,7 +52,7 @@ export class EmailService {
     user: User,
     verificationToken: string,
   ): Promise<void> {
-    const verificationUrl = `${this.clientURL}/auth/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${this.clientURL}/verify-email?token=${verificationToken}`;
     const emailContent = `
       <div style="font-family: Arial, sans-serif; color: #333;">
         <h2>Email Verification</h2>

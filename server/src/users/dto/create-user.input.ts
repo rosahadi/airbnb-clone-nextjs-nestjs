@@ -18,4 +18,10 @@ export class CreateUserInput {
   @IsString()
   @MinLength(8)
   password: string;
+
+  @Field({ defaultValue: false })
+  isEmailVerified?: boolean;
+
+  @Field({ nullable: true })
+  emailVerificationExpires?: Date;
 }

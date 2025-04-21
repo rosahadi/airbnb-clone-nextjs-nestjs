@@ -27,6 +27,17 @@ export class User {
   @Column()
   password: string;
 
+  @Field(() => [String])
+  @Column('text', { array: true, default: [Role.USER] })
+  roles: Role[];
+
+  @Field()
+  @Column({ default: false })
+  isEmailVerified: boolean;
+
+  @Column({ nullable: true })
+  emailVerificationExpires: Date;
+
   @Column({ nullable: true })
   passwordResetToken?: string;
 
@@ -40,10 +51,6 @@ export class User {
   @Field()
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @Field(() => [String])
-  @Column('text', { array: true, default: [Role.USER] })
-  roles: Role[];
 
   createPasswordResetToken() {
     const resetToken = crypto.randomBytes(32).toString('hex');

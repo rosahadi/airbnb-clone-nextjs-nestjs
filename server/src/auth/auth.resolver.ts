@@ -9,20 +9,30 @@ import { UpdatePasswordInput } from './dto/update-password.input';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { Public } from './decorators/public.decorator';
+import { SignupResponse } from './dto/signup-response.dto';
+import { UseGuards } from '@nestjs/common';
+import { VerifiedEmailGuard } from './guards/verified-email.guard';
 
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
-  @Mutation(() => AuthResponse)
+  @Mutation(() => SignupResponse)
   async signup(
     @Args('signupInput') signupInput: SignupInput,
-  ): Promise<AuthResponse> {
+  ): Promise<SignupResponse> {
     return this.authService.signup(signupInput);
   }
 
   @Public()
+  @Mutation(() => AuthResponse)
+  async verifyEmail(@Args('token') token: string): Promise<AuthResponse> {
+    return this.authService.verifyEmail(token);
+  }
+
+  @Public()
+  @UseGuards(VerifiedEmailGuard)
   @Mutation(() => AuthResponse)
   async login(
     @Args('loginInput') loginInput: LoginInput,
