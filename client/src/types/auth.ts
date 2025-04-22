@@ -1,34 +1,32 @@
-export interface SignupFormData {
-  name: string;
-  email: string;
-  password: string;
-  passwordConfirm: string;
+import {
+  forgotPasswordSchema,
+  signInSchema,
+  signupSchema,
+} from "@/schema/auth";
+import { z } from "zod";
+
+export type SignupFormData = z.infer<typeof signupSchema>;
+export type SignInFormData = z.infer<typeof signInSchema>;
+export type ForgotPasswordFormData = z.infer<
+  typeof forgotPasswordSchema
+>;
+
+export interface AuthError {
+  general?: string;
 }
 
-export interface SignupError {
+export interface SignupError extends AuthError {
   name?: string;
   email?: string;
   password?: string;
   passwordConfirm?: string;
-  general?: string;
 }
 
-export interface SignInFormData {
-  email: string;
-  password: string;
-}
-
-export interface SignInError {
+export interface SignInError extends AuthError {
   email?: string;
   password?: string;
-  general?: string;
 }
 
-export interface ForgotPasswordFormData {
-  email: string;
-}
-
-export interface ForgotPasswordError {
+export interface ForgotPasswordError extends AuthError {
   email?: string;
-  general?: string;
 }
