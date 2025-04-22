@@ -20,9 +20,12 @@ import {
 } from "../auth/AuthBtnLink";
 import { useAuth } from "@/stores/authStore";
 import Avatar from "../Avatar";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 function LinksDropdown() {
   const { user } = useAuth();
+  const router = useRouter();
   const isAdminUser = user?.roles?.includes("ADMIN");
 
   return (
@@ -33,14 +36,27 @@ function LinksDropdown() {
           className="flex items-center gap-2 pl-3 pr-2 rounded-full border border-gray-300 hover:shadow-md transition-all"
         >
           <Menu className="h-4 w-4" />
-          <Avatar src="" />
+          <span className="hidden md:block">
+            <Avatar src="" />
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-60 mt-2 p-2 rounded-xl shadow-lg"
+        className="w-72 mt-2 p-2 rounded-xl shadow-lg"
         align="end"
         sideOffset={5}
       >
+        <div className="flex justify-center pb-2 mb-2 border-b border-gray-200">
+          <Image
+            onClick={() => router.push("/")}
+            alt="logo"
+            className="cursor-pointer"
+            height="70"
+            width="70"
+            src="/images/logo.svg"
+          />
+        </div>
+
         <SignedOut>
           <DropdownMenuItem
             asChild
@@ -69,12 +85,16 @@ function LinksDropdown() {
             </Link>
           </DropdownMenuItem>
         </SignedOut>
+
         <SignedIn>
           <div className="pb-2">
             <DropdownMenuItem className="py-3 cursor-pointer font-medium focus:bg-gray-100">
-              <Link href="/profile" className="w-full">
-                {user?.name || "Profile"}
-              </Link>
+              <div className="flex items-center w-full gap-1">
+                <Avatar src="" />
+                <Link href="/profile" className="flex-1">
+                  {user?.name || "Profile"}
+                </Link>
+              </div>
             </DropdownMenuItem>
             <DropdownMenuItem className="py-3 cursor-pointer focus:bg-gray-100">
               <Link href="/trips" className="w-full">
