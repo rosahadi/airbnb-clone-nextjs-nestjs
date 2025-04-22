@@ -1,0 +1,53 @@
+import { gql } from "@apollo/client";
+
+export const SIGNUP_MUTATION = gql`
+  mutation Signup($signupInput: SignupInput!) {
+    signup(signupInput: $signupInput) {
+      message
+    }
+  }
+`;
+
+export const VERIFY_EMAIL_MUTATION = gql`
+  mutation VerifyEmail($token: String!) {
+    verifyEmail(token: $token) {
+      token
+      user {
+        id
+        name
+        email
+        roles
+      }
+    }
+  }
+`;
+
+export const LOGIN_MUTATION = gql`
+  mutation Login($loginInput: LoginInput!) {
+    login(loginInput: $loginInput) {
+      token
+      user {
+        id
+        name
+        email
+        roles
+      }
+    }
+  }
+`;
+
+export const FORGOT_PASSWORD_MUTATION = gql`
+  mutation ForgotPassword(
+    $forgotPasswordInput: ForgotPasswordInput!
+  ) {
+    forgotPassword(
+      forgotPasswordInput: $forgotPasswordInput
+    )
+  }
+`;
+
+export const LOGOUT_MUTATION = gql`
+  mutation Logout {
+    logout
+  }
+`;
