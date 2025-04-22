@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { SIGNUP_MUTATION } from "@/graphql/auth/mutations";
-import { SignupFormData, SignupError } from "@/types/auth";
 import { toast } from "sonner";
 import { useAuthModalStore } from "@/stores/authModalStore";
 import {
@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { signupSchema } from "@/schema/auth";
+import { SignupError, SignupFormData } from "@/types/auth";
 
 export function SignupModal() {
   const [errors, setErrors] = useState<SignupError | null>(
@@ -33,6 +35,7 @@ export function SignupModal() {
   const isOpen = activeModal === "signup";
 
   const form = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -53,7 +56,6 @@ export function SignupModal() {
     SIGNUP_MUTATION,
     {
       onCompleted: () => {
-        // Show success message with Sonner
         toast.success(
           "Please check your email for verification link",
           {
@@ -61,14 +63,11 @@ export function SignupModal() {
               "We've sent you a verification email.",
           }
         );
-
-        // Close modal after successful signup
         closeModal();
       },
       onError: (error) => {
         console.error("Signup error:", error);
 
-        // Handle GraphQL errors
         if (error.graphQLErrors?.length) {
           const gqlError = error.graphQLErrors[0];
 
@@ -78,14 +77,18 @@ export function SignupModal() {
               "Email already in use"
             )
           ) {
-            setErrors({ email: "Email already in use" });
+            form.setError("email", {
+              type: "manual",
+              message: "Email already in use",
+            });
           } else if (
             gqlError.message.includes(
               "Passwords do not match"
             )
           ) {
-            setErrors({
-              passwordConfirm: "Passwords do not match",
+            form.setError("passwordConfirm", {
+              type: "manual",
+              message: "Passwords do not match",
             });
           } else {
             setErrors({ general: gqlError.message });
@@ -105,37 +108,6 @@ export function SignupModal() {
   );
 
   const onSubmit = (data: SignupFormData) => {
-    // Basic validation
-    const validationErrors: SignupError = {};
-
-    if (!data.name) {
-      validationErrors.name = "Name is required";
-    }
-
-    if (!data.email) {
-      validationErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(data.email)) {
-      validationErrors.email =
-        "Please enter a valid email address";
-    }
-
-    if (!data.password) {
-      validationErrors.password = "Password is required";
-    } else if (data.password.length < 8) {
-      validationErrors.password =
-        "Password must be at least 8 characters";
-    }
-
-    if (data.password !== data.passwordConfirm) {
-      validationErrors.passwordConfirm =
-        "Passwords do not match";
-    }
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
     setErrors(null);
     signup({
       variables: {
@@ -148,7 +120,7 @@ export function SignupModal() {
     closeModal();
     setTimeout(() => {
       openSignIn();
-    }, 100); // Small delay to ensure modals don't overlap
+    }, 100);
   };
 
   return (
@@ -182,11 +154,7 @@ export function SignupModal() {
                         className="h-12 border-gray-300 rounded-lg"
                       />
                     </FormControl>
-                    {errors?.name && (
-                      <FormMessage className="text-red-500">
-                        {errors.name}
-                      </FormMessage>
-                    )}
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
@@ -205,11 +173,7 @@ export function SignupModal() {
                         className="h-12 border-gray-300 rounded-lg"
                       />
                     </FormControl>
-                    {errors?.email && (
-                      <FormMessage className="text-red-500">
-                        {errors.email}
-                      </FormMessage>
-                    )}
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
@@ -228,11 +192,7 @@ export function SignupModal() {
                         className="h-12 border-gray-300 rounded-lg"
                       />
                     </FormControl>
-                    {errors?.password && (
-                      <FormMessage className="text-red-500">
-                        {errors.password}
-                      </FormMessage>
-                    )}
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
@@ -251,11 +211,7 @@ export function SignupModal() {
                         className="h-12 border-gray-300 rounded-lg"
                       />
                     </FormControl>
-                    {errors?.passwordConfirm && (
-                      <FormMessage className="text-red-500">
-                        {errors.passwordConfirm}
-                      </FormMessage>
-                    )}
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
