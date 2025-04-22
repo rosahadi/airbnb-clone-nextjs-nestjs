@@ -10,8 +10,6 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { Public } from './decorators/public.decorator';
 import { SignupResponse } from './dto/signup-response.dto';
-import { UseGuards } from '@nestjs/common';
-import { VerifiedEmailGuard } from './guards/verified-email.guard';
 
 @Resolver()
 export class AuthResolver {
@@ -32,7 +30,6 @@ export class AuthResolver {
   }
 
   @Public()
-  @UseGuards(VerifiedEmailGuard)
   @Mutation(() => AuthResponse)
   async login(
     @Args('loginInput') loginInput: LoginInput,

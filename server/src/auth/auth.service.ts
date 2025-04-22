@@ -129,6 +129,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
+    if (!user.isEmailVerified) {
+      throw new UnauthorizedException(
+        'Email not verified. Please verify your email before logging in.',
+      );
+    }
+
     const token = this.generateToken(user);
 
     return { token, user };
