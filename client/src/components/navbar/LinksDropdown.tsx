@@ -24,12 +24,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 function LinksDropdown() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const isAdminUser = user?.roles?.includes("ADMIN");
 
   return (
-    <DropdownMenu>
+    <DropdownMenu key={isAuthenticated ? "in" : "out"}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
@@ -89,9 +89,12 @@ function LinksDropdown() {
         <SignedIn>
           <div className="pb-2">
             <DropdownMenuItem className="py-3 cursor-pointer font-medium focus:bg-gray-100">
-              <div className="flex items-center w-full gap-1">
-                <Avatar src="" />
-                <Link href="/profile" className="flex-1">
+              <div className="">
+                <Link
+                  href="/profile"
+                  className="flex items-center w-full gap-1"
+                >
+                  <Avatar src="" />
                   {user?.name || "Profile"}
                 </Link>
               </div>
@@ -121,12 +124,6 @@ function LinksDropdown() {
           <div className="pt-1">
             {links.map((link) => {
               if (link.label === "admin" && !isAdminUser)
-                return null;
-              if (
-                ["profile", "trips", "wishlists"].includes(
-                  link.label
-                )
-              )
                 return null;
               return (
                 <DropdownMenuItem

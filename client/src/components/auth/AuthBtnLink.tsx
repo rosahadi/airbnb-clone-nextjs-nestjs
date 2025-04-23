@@ -1,5 +1,4 @@
 "use client";
-
 import { ReactNode } from "react";
 import { useAuth } from "@/stores/authStore";
 import { SignupModal } from "./modal/SignupModal";
@@ -7,6 +6,7 @@ import { SignInModal } from "./modal/SignInModal";
 import { useLogout } from "@/hooks/useLogout";
 import { useAuthModalStore } from "@/stores/authModalStore";
 import { ForgotPasswordModal } from "./modal/ForgotPasswordModal";
+import { useRouter } from "next/navigation";
 
 interface AuthComponentProps {
   children: ReactNode;
@@ -52,7 +52,6 @@ export function SignInButton({
       </>
     );
   }
-
   return <>{children}</>;
 }
 
@@ -76,15 +75,21 @@ export function SignUpButton({
       </>
     );
   }
-
   return <>{children}</>;
 }
 
 export function SignOutLink() {
   const logout = useLogout();
+  const router = useRouter();
 
   return (
-    <button className="w-full text-left" onClick={logout}>
+    <button
+      className="w-full text-left cursor-pointer"
+      onClick={() => {
+        logout();
+        router.push("/");
+      }}
+    >
       Log out
     </button>
   );

@@ -11,7 +11,6 @@ export const SIGNUP_MUTATION = gql`
 export const VERIFY_EMAIL_MUTATION = gql`
   mutation VerifyEmail($token: String!) {
     verifyEmail(token: $token) {
-      token
       user {
         id
         name
@@ -25,7 +24,6 @@ export const VERIFY_EMAIL_MUTATION = gql`
 export const LOGIN_MUTATION = gql`
   mutation Login($loginInput: LoginInput!) {
     login(loginInput: $loginInput) {
-      token
       user {
         id
         name
@@ -51,7 +49,6 @@ export const RESET_PASSWORD_MUTATION = gql`
     $resetPasswordInput: ResetPasswordInput!
   ) {
     resetPassword(resetPasswordInput: $resetPasswordInput) {
-      token
       user {
         id
         name

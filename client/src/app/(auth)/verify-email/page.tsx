@@ -23,18 +23,9 @@ export default function VerifyEmailPage() {
 
   const [verifyEmail] = useMutation(VERIFY_EMAIL_MUTATION, {
     onCompleted: (data) => {
-      // Store the token in localStorage
-      localStorage.setItem("token", data.verifyEmail.token);
-
-      // Update auth state with new user data
       setUser(data.verifyEmail.user);
       setIsAuthenticated(true);
-
       setVerificationStatus("success");
-
-      toast.success("Email verified successfully!", {
-        description: "Your account has been verified.",
-      });
 
       setTimeout(() => {
         router.push("/");

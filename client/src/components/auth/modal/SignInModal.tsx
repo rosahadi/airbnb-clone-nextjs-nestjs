@@ -51,9 +51,6 @@ export function SignInModal() {
 
   const [login, { loading }] = useMutation(LOGIN_MUTATION, {
     onCompleted: (data) => {
-      if (data.login.token) {
-        localStorage.setItem("token", data.login.token);
-      }
       setUser(data.login.user);
       setIsAuthenticated(true);
       closeModal();

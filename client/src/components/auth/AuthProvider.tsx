@@ -1,5 +1,4 @@
 "use client";
-
 import { ReactNode, useEffect } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { useQuery } from "@apollo/client";
@@ -13,28 +12,27 @@ export function AuthProvider({
   const { setUser, setIsAuthenticated, setIsLoading } =
     useAuthStore();
 
-  const { data, loading } = useQuery(GET_CURRENT_USER, {
-    skip:
-      typeof window === "undefined" ||
-      !localStorage.getItem("token"),
-    fetchPolicy: "network-only",
-  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { data, loading, error } = useQuery(
+    GET_CURRENT_USER,
+    {
+      fetchPolicy: "network-only",
+      errorPolicy: "all",
+    }
+  );
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      setIsAuthenticated(!!token);
-      setIsLoading(loading);
+    setIsLoading(loading);
 
-      if (data?.me) {
-        setUser(data.me);
-      } else if (!loading && token) {
-        // If we have a token but no user data and we're not loading, clear the token
-        if (!data?.me) {
-          localStorage.removeItem("token");
-          setIsAuthenticated(false);
-        }
-      }
+    // If we have user data, we're authenticated
+    if (data?.me) {
+      setUser(data.me);
+      setIsAuthenticated(true);
+    } else if (!loading) {
+      // If we're not loading and don't have user data,
+      // we're not authenticated
+      setUser(null);
+      setIsAuthenticated(false);
     }
   }, [
     data,
