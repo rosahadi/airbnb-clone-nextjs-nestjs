@@ -32,12 +32,10 @@ export default function VerifyEmailPage() {
 
       setVerificationStatus("success");
 
-      // Show success message using Sonner
       toast.success("Email verified successfully!", {
         description: "Your account has been verified.",
       });
 
-      // Redirect to home page after small delay
       setTimeout(() => {
         router.push("/");
       }, 2000);
@@ -46,7 +44,6 @@ export default function VerifyEmailPage() {
       setVerificationStatus("error");
 
       if (error.graphQLErrors?.length) {
-        // Format the error message
         const message = error.graphQLErrors[0].message;
         setErrorMessage(message);
 

@@ -46,6 +46,22 @@ export const FORGOT_PASSWORD_MUTATION = gql`
   }
 `;
 
+export const RESET_PASSWORD_MUTATION = gql`
+  mutation ResetPassword(
+    $resetPasswordInput: ResetPasswordInput!
+  ) {
+    resetPassword(resetPasswordInput: $resetPasswordInput) {
+      token
+      user {
+        id
+        name
+        email
+        roles
+      }
+    }
+  }
+`;
+
 export const LOGOUT_MUTATION = gql`
   mutation Logout {
     logout

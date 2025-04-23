@@ -1,5 +1,6 @@
 import {
   forgotPasswordSchema,
+  resetPasswordSchema,
   signInSchema,
   signupSchema,
 } from "@/schema/auth";
@@ -9,6 +10,10 @@ export type SignupFormData = z.infer<typeof signupSchema>;
 export type SignInFormData = z.infer<typeof signInSchema>;
 export type ForgotPasswordFormData = z.infer<
   typeof forgotPasswordSchema
+>;
+
+export type ResetPasswordFormData = z.infer<
+  typeof resetPasswordSchema
 >;
 
 export interface AuthError {
@@ -29,4 +34,10 @@ export interface SignInError extends AuthError {
 
 export interface ForgotPasswordError extends AuthError {
   email?: string;
+}
+
+export interface ResetPasswordError extends AuthError {
+  password?: string;
+  passwordConfirm?: string;
+  token?: string;
 }
