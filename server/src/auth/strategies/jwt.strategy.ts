@@ -1,12 +1,12 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import type { Request } from 'express';
 
 import { TypedConfigService } from 'src/config/typed-config.service';
 import { UsersService } from '../../users/users.service';
 import { AuthConfig } from 'src/config/auth.config';
 import { Role } from 'src/users/role.enum';
+import { RequestWithCookies } from 'src/express';
 
 interface JwtPayload {
   sub: string;
@@ -28,9 +28,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new Error('Auth config not found');
     }
 
-    const jwtFromRequest = (req: Request): string | null => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      return ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+    const jwtFromRequest = (req: RequestWithCookies): string | null => {
+      // First try to extract from cookie
+      if (req.cookies?.jwt) {
+        return req.cookies.jwt;
+      }
+
+      // If not in cookie, try from auth header
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      return ExtractJwt.fromAuthHeaderAsBearerToken()(req) as string | null;
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
