@@ -13,6 +13,7 @@ import { ResetPasswordInput } from './dto/reset-password.input';
 import { EmailService } from '../email/email.service';
 import { User } from '../users/entities/user.entity';
 import { PasswordService } from './password.service';
+import { TokenUtils } from './utils/token.utils';
 
 interface VerificationTokenPayload {
   email: string;
@@ -29,6 +30,7 @@ export class AuthService {
     private configService: ConfigService,
     private emailService: EmailService,
     private passwordService: PasswordService,
+    private tokenUtils: TokenUtils,
   ) {}
 
   async signup(signupInput: SignupInput): Promise<{ message: string }> {
@@ -186,8 +188,7 @@ export class AuthService {
     await this.usersService.update(user.id, user);
 
     // Send email with reset token
-    const resetUrl = `${this.configService.get('CLIENT_URL')}/reset-password/${resetToken}`;
-    await this.emailService.sendPasswordReset(user, resetUrl);
+    await this.emailService.sendPasswordReset(user, resetToken);
   }
 
   async resetPassword(

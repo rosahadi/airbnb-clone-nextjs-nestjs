@@ -72,7 +72,8 @@ export class EmailService {
     });
   }
 
-  async sendPasswordReset(user: User, resetUrl: string): Promise<void> {
+  async sendPasswordReset(user: User, resetToken: string): Promise<void> {
+    const resetUrl = `${this.clientURL}/reset-password?token=${resetToken}`;
     const emailContent = `
       <div style="font-family: Arial, sans-serif; color: #333;">
         <h2>Password Reset</h2>

@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { User } from './users/user.entity';
 
 declare global {
@@ -6,4 +7,10 @@ declare global {
       user?: User;
     }
   }
+}
+
+interface RequestWithCookies extends Request {
+  cookies: {
+    jwt?: string;
+  };
 }

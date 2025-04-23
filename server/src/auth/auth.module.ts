@@ -14,6 +14,7 @@ import { RolesGuard } from './guards/roles.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { GqlAuthGuard } from './guards/auth.guard';
 import { VerifiedEmailGuard } from './guards/verified-email.guard';
+import { TokenUtils } from './utils/token.utils';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { VerifiedEmailGuard } from './guards/verified-email.guard';
     RolesGuard,
     GqlAuthGuard,
     VerifiedEmailGuard,
+    TokenUtils,
     {
       provide: APP_GUARD,
       useClass: GqlAuthGuard,
@@ -52,6 +54,6 @@ import { VerifiedEmailGuard } from './guards/verified-email.guard';
       useExisting: ConfigService,
     },
   ],
-  exports: [AuthService, PasswordService],
+  exports: [AuthService, PasswordService, TokenUtils],
 })
 export class AuthModule {}
