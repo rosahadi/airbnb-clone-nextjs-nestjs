@@ -12,6 +12,9 @@ export interface ConfigType {
 }
 
 export const appConfigSchema = Joi.object({
+  NODE_ENV: Joi.string()
+    .valid('development', 'production', 'test')
+    .default('development'),
   DB_HOST: Joi.string().default('localhost'),
   DB_PORT: Joi.number().default(5432),
   DB_USER: Joi.string().required(),
@@ -20,6 +23,7 @@ export const appConfigSchema = Joi.object({
   DB_SYNC: Joi.number().valid(0, 1).required(),
   JWT_SECRET: Joi.string().required(),
   JWT_EXPIRES_IN: Joi.string().required(),
+  JWT_COOKIE_EXPIRES_IN: Joi.number().default(90),
   CLIENT_URL: Joi.string().uri().default('http://localhost:3000'),
   RESEND_API_KEY: Joi.string().required(),
   FROM_EMAIL: Joi.string().email().default('Taskard <no-reply@rosah.dev>'),
