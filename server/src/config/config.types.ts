@@ -3,12 +3,14 @@ import * as Joi from 'joi';
 import { AuthConfig } from './auth.config';
 import { FrontendConfig } from './frontend.config';
 import { EmailConfig } from './email.config';
+import { CloudinaryConfig } from './cloudinary.config';
 
 export interface ConfigType {
   database: TypeOrmModuleOptions;
   auth: AuthConfig;
   frontend: FrontendConfig;
   email: EmailConfig;
+  cloudinary: CloudinaryConfig;
 }
 
 export const appConfigSchema = Joi.object({
@@ -27,4 +29,11 @@ export const appConfigSchema = Joi.object({
   CLIENT_URL: Joi.string().uri().default('http://localhost:3000'),
   RESEND_API_KEY: Joi.string().required(),
   FROM_EMAIL: Joi.string().email().default('Taskard <no-reply@rosah.dev>'),
+
+  CLOUDINARY_CLOUD_NAME: Joi.string().required(),
+  CLOUDINARY_API_KEY: Joi.string().required(),
+  CLOUDINARY_API_SECRET: Joi.string().required(),
+  CLOUDINARY_BASE_FOLDER: Joi.string().default('airbnb'),
+  CLOUDINARY_PROFILE_SIZE_LIMIT: Joi.number().default(5 * 1024 * 1024), // 5MB
+  CLOUDINARY_PROPERTY_SIZE_LIMIT: Joi.number().default(10 * 1024 * 1024), // 10MB
 });
