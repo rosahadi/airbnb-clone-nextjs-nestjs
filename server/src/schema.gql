@@ -6,10 +6,31 @@ type AuthResponse {
   user: User!
 }
 
+type Booking {
+  checkIn: DateTime!
+  checkOut: DateTime!
+  createdAt: DateTime!
+  id: ID!
+  orderTotal: Int!
+  paymentStatus: Boolean!
+  property: Property!
+  totalNights: Int!
+  updatedAt: DateTime!
+  user: User!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type Favorite {
+  createdAt: DateTime!
+  id: ID!
+  property: Property!
+  updatedAt: DateTime!
+  user: User!
+}
 
 input ForgotPasswordInput {
   email: String!
@@ -28,10 +49,32 @@ type Mutation {
   logout: Boolean!
   resetPassword(resetPasswordInput: ResetPasswordInput!): AuthResponse!
   signup(signupInput: SignupInput!): SignupResponse!
-  updateMe(updateUserInput: UpdateUserInput!): User!
+  updateMe(updateMeInput: UpdateMeInput!): User!
   updatePassword(updatePasswordInput: UpdatePasswordInput!): AuthResponse!
   updateUser(id: ID!, updateUserInput: UpdateUserInput!): User!
   verifyEmail(token: String!): AuthResponse!
+}
+
+type Property {
+  amenities: String!
+  baths: Int!
+  bedrooms: Int!
+  beds: Int!
+  bookings: [Booking!]
+  category: String!
+  country: String!
+  createdAt: DateTime!
+  description: String!
+  favorites: [Favorite!]
+  guests: Int!
+  id: ID!
+  image: String!
+  name: String!
+  price: Int!
+  reviews: [Review!]
+  tagline: String!
+  updatedAt: DateTime!
+  user: User!
 }
 
 type Query {
@@ -46,6 +89,16 @@ input ResetPasswordInput {
   token: String!
 }
 
+type Review {
+  comment: String!
+  createdAt: DateTime!
+  id: ID!
+  property: Property!
+  rating: Int!
+  updatedAt: DateTime!
+  user: User!
+}
+
 input SignupInput {
   email: String!
   name: String!
@@ -55,6 +108,12 @@ input SignupInput {
 
 type SignupResponse {
   message: String!
+}
+
+input UpdateMeInput {
+  email: String
+  name: String
+  profileImage: String
 }
 
 input UpdatePasswordInput {
@@ -70,11 +129,16 @@ input UpdateUserInput {
 }
 
 type User {
+  bookings: [Booking!]
   createdAt: DateTime!
   email: String!
+  favorites: [Favorite!]
   id: ID!
   isEmailVerified: Boolean!
   name: String!
+  profileImage: String
+  properties: [Property!]
+  reviews: [Review!]
   roles: [String!]!
   updatedAt: DateTime!
 }
