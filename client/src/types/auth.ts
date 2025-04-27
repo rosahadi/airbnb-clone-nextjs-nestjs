@@ -1,5 +1,6 @@
 import {
   forgotPasswordSchema,
+  passwordSchema,
   resetPasswordSchema,
   signInSchema,
   signupSchema,
@@ -10,6 +11,9 @@ export type SignupFormData = z.infer<typeof signupSchema>;
 export type SignInFormData = z.infer<typeof signInSchema>;
 export type ForgotPasswordFormData = z.infer<
   typeof forgotPasswordSchema
+>;
+export type PasswordFormData = z.infer<
+  typeof passwordSchema
 >;
 
 export type ResetPasswordFormData = z.infer<
@@ -40,4 +44,10 @@ export interface ResetPasswordError extends AuthError {
   password?: string;
   passwordConfirm?: string;
   token?: string;
+}
+
+export interface PasswordError extends AuthError {
+  currentPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
 }
