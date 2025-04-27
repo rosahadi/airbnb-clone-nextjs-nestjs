@@ -85,6 +85,10 @@ export class CloudinaryService implements OnModuleInit {
     fileBuffer: Buffer,
     fileName: string,
   ): Promise<ImageUploadResult> {
+    if (!Buffer.isBuffer(fileBuffer)) {
+      throw new Error('Invalid file buffer provided');
+    }
+
     return this.uploadImage(fileBuffer, {
       baseFolder: this.config.baseFolder,
       subFolder: this.config.folders.profiles,
