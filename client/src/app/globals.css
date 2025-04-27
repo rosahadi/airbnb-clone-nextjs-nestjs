@@ -134,3 +134,6 @@
 .primary:hover {
   background-color: var(--primary-hover);
 }
+.text-primary {
+  color: var(--primary);
+}

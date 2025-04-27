@@ -5,6 +5,7 @@ import { ApolloWrapper } from "@/lib/ApolloWrapper";
 import Navbar from "@/components/navbar/Navbar";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { Toaster } from "sonner";
+import { MainContent } from "@/components/MainContent";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -24,7 +25,7 @@ export default function RootLayout({
           <AuthProvider>
             <Navbar />
             <Toaster />
-            {children}
+            <MainContent> {children}</MainContent>
           </AuthProvider>
         </ApolloWrapper>
       </body>
