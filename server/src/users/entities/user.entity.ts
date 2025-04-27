@@ -5,9 +5,14 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Role } from '../role.enum';
 import * as crypto from 'crypto';
+import { Property } from 'src/property/entities/property.entity';
+import { Favorite } from 'src/property/entities/favorite.entity';
+import { Review } from 'src/property/entities/review.entity';
+import { Booking } from 'src/property/entities/booking.entity';
 
 @ObjectType()
 @Entity()
@@ -31,6 +36,10 @@ export class User {
   @Column('text', { array: true, default: [Role.USER] })
   roles: Role[];
 
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
+  profileImage?: string;
+
   @Field()
   @Column({ default: false })
   isEmailVerified: boolean;
@@ -51,6 +60,22 @@ export class User {
   @Field()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Field(() => [Property], { nullable: true })
+  @OneToMany(() => Property, (property) => property.user)
+  properties: Property[];
+
+  @Field(() => [Favorite], { nullable: true })
+  @OneToMany(() => Favorite, (favorite) => favorite.user)
+  favorites: Favorite[];
+
+  @Field(() => [Review], { nullable: true })
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
+
+  @Field(() => [Booking], { nullable: true })
+  @OneToMany(() => Booking, (booking) => booking.user)
+  bookings: Booking[];
 
   createPasswordResetToken() {
     const resetToken = crypto.randomBytes(32).toString('hex');
