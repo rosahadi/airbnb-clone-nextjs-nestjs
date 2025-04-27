@@ -64,3 +64,20 @@ export const LOGOUT_MUTATION = gql`
     logout
   }
 `;
+
+export const UPDATE_PASSWORD_MUTATION = gql`
+  mutation UpdatePassword(
+    $updatePasswordInput: UpdatePasswordInput!
+  ) {
+    updatePassword(
+      updatePasswordInput: $updatePasswordInput
+    ) {
+      user {
+        id
+        name
+        email
+        profileImage
+      }
+    }
+  }
+`;

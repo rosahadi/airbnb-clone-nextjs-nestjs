@@ -7,6 +7,7 @@ export const GET_CURRENT_USER = gql`
       name
       email
       roles
+      profileImage
     }
   }
 `;
