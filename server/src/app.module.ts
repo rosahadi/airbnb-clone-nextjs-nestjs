@@ -17,6 +17,12 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './email/email.module';
 import { emailConfig } from './config/email.config';
+import { cloudinaryConfig } from './config/cloudinary.config';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { Property } from './property/entities/property.entity';
+import { Favorite } from './property/entities/favorite.entity';
+import { Booking } from './property/entities/booking.entity';
+import { Review } from './property/entities/review.entity';
 
 @Module({
   imports: [
@@ -25,13 +31,19 @@ import { emailConfig } from './config/email.config';
       inject: [ConfigService],
       useFactory: async (configService: TypedConfigService) => ({
         ...(await configService.get('database')),
-        entities: [User],
+        entities: [User, Property, Favorite, Booking, Review],
       }),
     }),
 
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [typeOrmConfig, authConfig, frontendConfig, emailConfig],
+      load: [
+        typeOrmConfig,
+        authConfig,
+        frontendConfig,
+        emailConfig,
+        cloudinaryConfig,
+      ],
       validationSchema: appConfigSchema,
       validationOptions: {
         abortEarly: true,
@@ -52,6 +64,7 @@ import { emailConfig } from './config/email.config';
     UsersModule,
     AuthModule,
     EmailModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [

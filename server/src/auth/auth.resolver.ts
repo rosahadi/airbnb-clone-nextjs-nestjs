@@ -12,6 +12,8 @@ import { Public } from './decorators/public.decorator';
 import { SignupResponse } from './dto/signup-response.dto';
 import { TokenUtils } from './utils/token.utils';
 import { Request, Response } from 'express';
+import { UseGuards } from '@nestjs/common';
+import { VerifiedEmailGuard } from './guards/verified-email.guard';
 
 export interface GqlContext {
   req: Request;
@@ -63,6 +65,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => AuthResponse)
+  @UseGuards(VerifiedEmailGuard)
   async updatePassword(
     @CurrentUser() user: User,
     @Args('updatePasswordInput') updatePasswordInput: UpdatePasswordInput,
