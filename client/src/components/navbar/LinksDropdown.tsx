@@ -99,16 +99,6 @@ function LinksDropdown() {
                 </Link>
               </div>
             </DropdownMenuItem>
-            <DropdownMenuItem className="py-3 cursor-pointer focus:bg-gray-100">
-              <Link href="/trips" className="w-full">
-                Trips
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="py-3 cursor-pointer focus:bg-gray-100">
-              <Link href="/wishlists" className="w-full">
-                Wishlists
-              </Link>
-            </DropdownMenuItem>
           </div>
           <DropdownMenuSeparator className="my-1" />
           {isAdminUser && (
