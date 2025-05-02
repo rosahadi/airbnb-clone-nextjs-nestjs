@@ -23,6 +23,7 @@ import { Property } from './property/entities/property.entity';
 import { Favorite } from './property/entities/favorite.entity';
 import { Booking } from './property/entities/booking.entity';
 import { Review } from './property/entities/review.entity';
+import { PropertyModule } from './property/property.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { Review } from './property/entities/review.entity';
     AuthModule,
     EmailModule,
     CloudinaryModule,
+    PropertyModule,
   ],
   controllers: [AppController],
   providers: [

@@ -19,6 +19,21 @@ type Booking {
   user: User!
 }
 
+input CreatePropertyInput {
+  amenities: String!
+  baths: Int!
+  bedrooms: Int!
+  beds: Int!
+  category: String!
+  country: String!
+  description: String!
+  guests: Int!
+  image: String!
+  name: String!
+  price: Int!
+  tagline: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -42,7 +57,9 @@ input LoginInput {
 }
 
 type Mutation {
+  createProperty(createPropertyInput: CreatePropertyInput!): Property!
   deleteMe: User!
+  deleteProperty(id: ID!): Property!
   deleteUser(id: ID!): User!
   forgotPassword(forgotPasswordInput: ForgotPasswordInput!): Boolean!
   login(loginInput: LoginInput!): AuthResponse!
@@ -51,6 +68,7 @@ type Mutation {
   signup(signupInput: SignupInput!): SignupResponse!
   updateMe(updateMeInput: UpdateMeInput!): User!
   updatePassword(updatePasswordInput: UpdatePasswordInput!): AuthResponse!
+  updateProperty(id: ID!, updatePropertyInput: UpdatePropertyInput!): Property!
   updateUser(id: ID!, updateUserInput: UpdateUserInput!): User!
   verifyEmail(token: String!): AuthResponse!
 }
@@ -77,8 +95,15 @@ type Property {
   user: User!
 }
 
+input PropertyFilterInput {
+  category: String
+}
+
 type Query {
   me: User!
+  myProperties: [Property!]!
+  properties(filters: PropertyFilterInput): [Property!]!
+  property(id: ID!): Property!
   user(id: ID!): User!
   users: [User!]!
 }
@@ -120,6 +145,21 @@ input UpdatePasswordInput {
   currentPassword: String!
   password: String!
   passwordConfirm: String!
+}
+
+input UpdatePropertyInput {
+  amenities: String
+  baths: Int
+  bedrooms: Int
+  beds: Int
+  category: String
+  country: String
+  description: String
+  guests: Int
+  image: String
+  name: String
+  price: Int
+  tagline: String
 }
 
 input UpdateUserInput {
