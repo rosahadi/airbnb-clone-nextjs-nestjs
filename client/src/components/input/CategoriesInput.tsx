@@ -1,4 +1,3 @@
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -25,12 +24,6 @@ function CategoriesInput({
 
   return (
     <div className="mb-2">
-      <Label
-        htmlFor={name}
-        className="block text-sm font-medium text-gray-700 mb-1"
-      >
-        Property Category
-      </Label>
       <Select
         defaultValue={defaultValue || categories[0].label}
         name={name}

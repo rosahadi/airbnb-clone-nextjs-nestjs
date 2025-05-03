@@ -1,4 +1,4 @@
-import { Label } from "@/components/ui/label";
+import { useEffect } from "react";
 import { formattedCountries } from "@/utils/countries";
 import {
   Select,
@@ -17,6 +17,14 @@ function CountriesInput({
   defaultValue?: string;
   onChange?: (value: string) => void;
 }) {
+  const defaultCountry = formattedCountries[0].code;
+
+  useEffect(() => {
+    if (!defaultValue && onChange) {
+      onChange(defaultCountry);
+    }
+  }, [defaultValue, onChange, defaultCountry]);
+
   const handleValueChange = (value: string) => {
     if (onChange) {
       onChange(value);
@@ -25,16 +33,8 @@ function CountriesInput({
 
   return (
     <div className="mb-2">
-      <Label
-        htmlFor={name}
-        className="block text-sm font-medium text-gray-700 mb-1"
-      >
-        Country
-      </Label>
       <Select
-        defaultValue={
-          defaultValue || formattedCountries[0].code
-        }
+        defaultValue={defaultValue || defaultCountry}
         name={name}
         onValueChange={handleValueChange}
         required
