@@ -1,28 +1,26 @@
 "use client";
 
-import { Input } from "../ui/input";
+import { ChangeEvent, useState } from "react";
 import { Label } from "../ui/label";
-import { ChangeEvent } from "react";
+import { Input } from "../ui/input";
 
 interface ImageInputProps {
-  onChange?: (imageData: string) => void;
+  onChange?: (file: File) => void;
 }
 
 function ImageInput({ onChange }: ImageInputProps) {
   const name = "image";
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFileChange = (
     e: ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = event.target?.result as string;
-        onChange?.(result);
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    setIsLoading(true);
+    onChange?.(file);
+    setIsLoading(false);
   };
 
   return (
@@ -38,7 +36,13 @@ function ImageInput({ onChange }: ImageInputProps) {
         accept="image/*"
         className="max-w-xs"
         onChange={handleFileChange}
+        disabled={isLoading}
       />
+      {isLoading && (
+        <p className="text-xs text-gray-500 mt-1">
+          Processing image...
+        </p>
+      )}
     </div>
   );
 }
