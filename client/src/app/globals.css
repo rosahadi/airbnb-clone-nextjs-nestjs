@@ -137,3 +137,7 @@
 .text-primary {
   color: var(--primary);
 }
+
+button {
+  cursor: pointer;
+}
