@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@apollo/client";
 import { toast } from "sonner";
-import { CREATE_PROPERTY_MUTATION } from "@/graphql/property/mutations";
+import { CREATE_PROPERTY_MUTATION } from "@/graphql/property";
 import Container from "@/components/Container";
 import { useRouter } from "next/navigation";
 import { propertySchema } from "@/schema/property";
@@ -15,7 +15,7 @@ import {
 } from "@/types/property";
 import TabNavigation, {
   TabType,
-} from "@/components/host/create/TabNavigation";
+} from "@/components/host/TabNavigation";
 import { Form } from "@/components/ui/form";
 import { AlertCircle } from "lucide-react";
 import {
@@ -24,11 +24,11 @@ import {
 } from "@/components/ui/alert";
 
 // Tab components import
-import BasicInfoTab from "@/components/host/create/BasicInfoTab";
-import PropertyDetailsTab from "@/components/host/create/PropertyDetailsTab";
-import AmenitiesTab from "@/components/host/create/AmenitiesTab";
-import PhotosTab from "@/components/host/create/PhotosTab";
-import ReviewTab from "@/components/host/create/ReviewTab";
+import BasicInfoTab from "@/components/host/BasicInfoTab";
+import PropertyDetailsTab from "@/components/host/PropertyDetailsTab";
+import AmenitiesTab from "@/components/host/AmenitiesTab";
+import PhotosTab from "@/components/host/PhotosTab";
+import ReviewTab from "@/components/host/ReviewTab";
 import { formattedCountries } from "@/utils/countries";
 
 const CreatePropertyPage: React.FC = () => {
