@@ -34,9 +34,12 @@ export const propertySchema = z.object({
 });
 
 export const propertyFilterSchema = z.object({
-  search: z.string().optional(),
   category: z.string().optional(),
 });
 
 export const updatePropertySchema =
   propertySchema.partial();
+
+export const propertyIdSchema = z.object({
+  id: z.string().uuid("Invalid property ID format"),
+});

@@ -1,9 +1,16 @@
 import {
   propertyFilterSchema,
+  propertyIdSchema,
   propertySchema,
   updatePropertySchema,
 } from "@/schema/property";
 import { z } from "zod";
+
+export interface Property {
+  id: string;
+  name: string;
+  price: number;
+}
 
 export type PropertyFormData = z.infer<
   typeof propertySchema
@@ -13,6 +20,9 @@ export type PropertyFilterData = z.infer<
 >;
 export type UpdatePropertyFormData = z.infer<
   typeof updatePropertySchema
+>;
+export type PropertyIdParams = z.infer<
+  typeof propertyIdSchema
 >;
 
 export interface PropertyError {
@@ -32,6 +42,5 @@ export interface PropertyError {
 }
 
 export interface PropertyFilterError {
-  search?: string;
   category?: string;
 }
