@@ -5,15 +5,15 @@ import { Camera } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
-  PropertyFormData,
   PropertyError,
+  PropertyFormUnion,
 } from "@/types/property";
 import ImageInput from "@/components/input/ImageInput";
 import Image from "next/image";
 
-interface PhotosTabProps {
+interface PhotosTabProps<T extends PropertyFormUnion> {
   isVisible: boolean;
-  form: UseFormReturn<PropertyFormData>;
+  form: UseFormReturn<T>;
   errors: PropertyError | null;
   navigateBack: () => void;
   navigateNext: () => void;
@@ -21,14 +21,14 @@ interface PhotosTabProps {
   onImageChange: (file: File) => void;
 }
 
-const PhotosTab: React.FC<PhotosTabProps> = ({
+const PhotosTab = <T extends PropertyFormUnion>({
   isVisible,
   errors,
   navigateBack,
   navigateNext,
   previewImage,
   onImageChange,
-}) => {
+}: PhotosTabProps<T>) => {
   if (!isVisible) return null;
 
   return (

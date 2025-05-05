@@ -9,13 +9,13 @@ import Image from "next/image";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
-  PropertyFormData,
   PropertyError,
+  PropertyFormUnion,
 } from "@/types/property";
 
-interface ReviewTabProps {
+interface ReviewTabProps<T extends PropertyFormUnion> {
   isVisible: boolean;
-  form: UseFormReturn<PropertyFormData>;
+  form: UseFormReturn<T>;
   errors: PropertyError | null;
   previewImage: string | null;
   loading: boolean;
@@ -23,7 +23,7 @@ interface ReviewTabProps {
   navigateToTab: (tab: TabType) => void;
 }
 
-const ReviewTab: React.FC<ReviewTabProps> = ({
+const ReviewTab = <T extends PropertyFormUnion>({
   isVisible,
   form,
   errors,
@@ -31,7 +31,7 @@ const ReviewTab: React.FC<ReviewTabProps> = ({
   loading,
   navigateBack,
   navigateToTab,
-}) => {
+}: ReviewTabProps<T>) => {
   const formData = form.watch();
 
   if (!isVisible) return null;

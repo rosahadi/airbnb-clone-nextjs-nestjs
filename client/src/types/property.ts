@@ -25,6 +25,10 @@ export type PropertyIdParams = z.infer<
   typeof propertyIdSchema
 >;
 
+export type PropertyFormUnion =
+  | PropertyFormData
+  | UpdatePropertyFormData;
+
 export interface PropertyError {
   general?: string;
   name?: string;

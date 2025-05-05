@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { conservativeAmenities } from "@/utils/amenities";
 import { IconType } from "react-icons";
 
@@ -10,22 +10,49 @@ type Amenity = {
 
 interface AmenitiesInputProps {
   onChange?: (selectedAmenities: string[]) => void;
+  value?: string;
 }
 
-function AmenitiesInput({ onChange }: AmenitiesInputProps) {
+function AmenitiesInput({
+  onChange,
+  value = "[]",
+}: AmenitiesInputProps) {
+  // Parse the initial value from string to array
+  const initialSelected = useMemo(() => {
+    try {
+      return JSON.parse(value) as string[];
+    } catch {
+      return [];
+    }
+  }, [value]);
+
   const [selectedAmenities, setSelectedAmenities] =
     useState<Amenity[]>(
       conservativeAmenities.map((amenity) => ({
         ...amenity,
-        selected: false,
+        selected: initialSelected.includes(amenity.name),
       }))
     );
+
+  // Update when value prop changes
+  useEffect(() => {
+    try {
+      const newSelected = JSON.parse(value) as string[];
+      setSelectedAmenities(
+        conservativeAmenities.map((amenity) => ({
+          ...amenity,
+          selected: newSelected.includes(amenity.name),
+        }))
+      );
+    } catch {
+      // Handle parse error
+    }
+  }, [value]);
 
   const handleToggleAmenity = (index: number) => {
     const updatedAmenities = [...selectedAmenities];
     updatedAmenities[index].selected =
       !updatedAmenities[index].selected;
-
     setSelectedAmenities(updatedAmenities);
 
     const selected = updatedAmenities

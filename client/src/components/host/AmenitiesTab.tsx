@@ -1,18 +1,16 @@
-"use client";
-
 import React from "react";
 import { Star } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, Path } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
-  PropertyFormData,
   PropertyError,
+  PropertyFormUnion,
 } from "@/types/property";
 import AmenitiesInput from "@/components/input/AmenitiesInput";
 
-interface AmenitiesTabProps {
+interface AmenitiesTabProps<T extends PropertyFormUnion> {
   isVisible: boolean;
-  form: UseFormReturn<PropertyFormData>;
+  form: UseFormReturn<T>;
   errors: PropertyError | null;
   handleAmenitiesChange: (
     selectedAmenities: string[]
@@ -21,14 +19,27 @@ interface AmenitiesTabProps {
   navigateNext: () => void;
 }
 
-const AmenitiesTab: React.FC<AmenitiesTabProps> = ({
+const AmenitiesTab = <T extends PropertyFormUnion>({
   isVisible,
+  form,
   errors,
   handleAmenitiesChange,
   navigateBack,
   navigateNext,
-}) => {
+}: AmenitiesTabProps<T>) => {
   if (!isVisible) return null;
+
+  const amenitiesValue = form.watch("amenities" as Path<T>);
+
+  const stringValue = (() => {
+    if (typeof amenitiesValue === "string") {
+      return amenitiesValue;
+    }
+    if (Array.isArray(amenitiesValue)) {
+      return JSON.stringify(amenitiesValue);
+    }
+    return "[]";
+  })();
 
   return (
     <div>
@@ -38,18 +49,18 @@ const AmenitiesTab: React.FC<AmenitiesTabProps> = ({
           What amenities do you offer?
         </h2>
       </div>
-
       <p className="text-gray-600 mb-6">
         Select all amenities available to guests
       </p>
-
-      <AmenitiesInput onChange={handleAmenitiesChange} />
+      <AmenitiesInput
+        onChange={handleAmenitiesChange}
+        value={stringValue}
+      />
       {errors?.amenities && (
         <p className="text-sm text-red-500 mt-1">
           {errors.amenities}
         </p>
       )}
-
       <div className="mt-8 flex justify-between">
         <Button
           type="button"

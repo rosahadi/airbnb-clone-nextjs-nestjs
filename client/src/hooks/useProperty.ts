@@ -22,6 +22,7 @@ export const useProperty = (id: string) => {
   return useQuery(GET_PROPERTY_QUERY, {
     variables: { id },
     fetchPolicy: "cache-and-network",
+    skip: !id,
   });
 };
 

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { formattedCountries } from "@/utils/countries";
 import {
   Select,
@@ -8,8 +8,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const name = "country";
-
 function CountriesInput({
   defaultValue,
   onChange,
@@ -17,41 +15,53 @@ function CountriesInput({
   defaultValue?: string;
   onChange?: (value: string) => void;
 }) {
-  const defaultCountry = formattedCountries[0].code;
+  const [componentKey, setComponentKey] = useState(
+    Date.now()
+  );
+  const [currentValue, setCurrentValue] = useState(
+    defaultValue || ""
+  );
 
   useEffect(() => {
-    if (!defaultValue && onChange) {
-      onChange(defaultCountry);
+    if (defaultValue && defaultValue !== currentValue) {
+      setCurrentValue(defaultValue);
+      setComponentKey(Date.now());
     }
-  }, [defaultValue, onChange, defaultCountry]);
+  }, [defaultValue, currentValue]);
 
   const handleValueChange = (value: string) => {
-    if (onChange) {
-      onChange(value);
-    }
+    setCurrentValue(value);
+    onChange?.(value);
   };
 
+  // Find the country object for the selected code
+  const selectedCountry = formattedCountries.find(
+    (c) => c.code === currentValue
+  );
+  const displayText = selectedCountry
+    ? `${selectedCountry.flag} ${selectedCountry.name}`
+    : "Select a country";
+
   return (
-    <div className="mb-2">
+    <div className="mb-2" key={componentKey}>
       <Select
-        defaultValue={defaultValue || defaultCountry}
-        name={name}
+        value={currentValue}
         onValueChange={handleValueChange}
         required
       >
-        <SelectTrigger id={name}>
-          <SelectValue />
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select a country">
+            {displayText}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {formattedCountries.map((item) => {
-            return (
-              <SelectItem key={item.code} value={item.code}>
-                <span className="flex items-center gap-2">
-                  {item.flag} {item.name}
-                </span>
-              </SelectItem>
-            );
-          })}
+          {formattedCountries.map((item) => (
+            <SelectItem key={item.code} value={item.code}>
+              <span className="flex items-center gap-2">
+                {item.flag} {item.name}
+              </span>
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

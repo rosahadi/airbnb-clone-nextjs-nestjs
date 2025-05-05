@@ -38,7 +38,11 @@ const PROPERTY_WITH_RELATIONS_FIELDS = gql`
     ...PropertyWithUserFields
     favorites {
       id
-      userId
+      user {
+        id
+        name
+        email
+      }
     }
     reviews {
       id
@@ -65,7 +69,7 @@ export const GET_PROPERTIES_QUERY = gql`
 
 export const GET_PROPERTY_QUERY = gql`
   ${PROPERTY_WITH_RELATIONS_FIELDS}
-  query GetProperty($id: ID!) {
+  query property($id: ID!) {
     property(id: $id) {
       ...PropertyWithRelationsFields
     }

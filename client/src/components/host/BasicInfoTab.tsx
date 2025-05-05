@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Home } from "lucide-react";
 import {
@@ -14,23 +15,23 @@ import { UseFormReturn } from "react-hook-form";
 import CountriesInput from "@/components/input/CountriesInput";
 import CategoryList from "@/components/host/CategoryList";
 import {
-  PropertyFormData,
   PropertyError,
+  PropertyFormUnion,
 } from "@/types/property";
 
-interface BasicInfoTabProps {
+interface BasicInfoTabProps<T extends PropertyFormUnion> {
   isVisible: boolean;
-  form: UseFormReturn<PropertyFormData>;
+  form: UseFormReturn<T>;
   errors: PropertyError | null;
   navigateTab: () => void;
 }
 
-const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
+const BasicInfoTab = <T extends PropertyFormUnion>({
   isVisible,
   form,
   errors,
   navigateTab,
-}) => {
+}: BasicInfoTabProps<T>) => {
   if (!isVisible) return null;
 
   return (
@@ -45,7 +46,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
       <div className="grid md:grid-cols-2 gap-6">
         <FormField
           control={form.control}
-          name="name"
+          name={"name" as any}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Property name</FormLabel>
@@ -67,7 +68,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
 
         <FormField
           control={form.control}
-          name="tagline"
+          name={"tagline" as any}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Tagline</FormLabel>
@@ -91,7 +92,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
       <div className="grid md:grid-cols-2 gap-6 mt-6">
         <FormField
           control={form.control}
-          name="price"
+          name={"price" as any}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Price per night (USD)</FormLabel>
@@ -123,7 +124,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
 
         <FormField
           control={form.control}
-          name="country"
+          name={"country" as any}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Country</FormLabel>
@@ -149,7 +150,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
       <div className="mt-6">
         <FormField
           control={form.control}
-          name="category"
+          name={"category" as any}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
@@ -175,7 +176,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
       <div className="mt-6">
         <FormField
           control={form.control}
-          name="description"
+          name={"description" as any}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>

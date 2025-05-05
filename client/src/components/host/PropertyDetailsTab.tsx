@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
@@ -5,39 +6,98 @@ import { User } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
-  PropertyFormData,
+  PropertyFormUnion,
   PropertyError,
 } from "@/types/property";
 
-interface PropertyDetailsTabProps {
+interface PropertyDetailsTabProps<
+  T extends PropertyFormUnion
+> {
   isVisible: boolean;
-  form: UseFormReturn<PropertyFormData>;
+  form: UseFormReturn<T>;
   errors: PropertyError | null;
   navigateBack: () => void;
   navigateNext: () => void;
 }
 
-const PropertyDetailsTab: React.FC<
-  PropertyDetailsTabProps
-> = ({
+type CounterField =
+  | "guests"
+  | "bedrooms"
+  | "beds"
+  | "baths";
+
+const PropertyDetailsTab = <T extends PropertyFormUnion>({
   isVisible,
   form,
   errors,
   navigateBack,
   navigateNext,
-}) => {
+}: PropertyDetailsTabProps<T>) => {
   if (!isVisible) return null;
 
-  // Function to handle counter changes
+  // Type-safe function to handle counter changes
   const handleCounterChange = (
-    name: keyof PropertyFormData,
+    name: CounterField,
     value: number
   ) => {
-    form.setValue(name, value);
+    form.setValue(name as any, value as any);
   };
 
-  // Get form values
   const formValues = form.getValues();
+
+  // Helper function to render counter inputs
+  const renderCounter = (
+    field: CounterField,
+    label: string
+  ) => {
+    const currentValue = Number(formValues[field]) || 1;
+    const fieldError = errors?.[field];
+
+    return (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {label}
+        </label>
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() =>
+              handleCounterChange(
+                field,
+                Math.max(1, currentValue - 1)
+              )
+            }
+            className="p-2 border border-gray-300 rounded-l-lg hover:bg-gray-100"
+          >
+            -
+          </button>
+          <span
+            className={`px-4 py-2 border-t border-b ${
+              fieldError
+                ? "border-red-500"
+                : "border-gray-300"
+            } min-w-16 text-center`}
+          >
+            {currentValue}
+          </span>
+          <button
+            type="button"
+            onClick={() =>
+              handleCounterChange(field, currentValue + 1)
+            }
+            className="p-2 border border-gray-300 rounded-r-lg hover:bg-gray-100"
+          >
+            +
+          </button>
+        </div>
+        {fieldError && (
+          <p className="text-sm text-red-500 mt-1">
+            {fieldError}
+          </p>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -54,189 +114,13 @@ const PropertyDetailsTab: React.FC<
       </p>
 
       <div className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Maximum number of guests
-          </label>
-          <div className="flex items-center">
-            <button
-              type="button"
-              onClick={() =>
-                handleCounterChange(
-                  "guests",
-                  Math.max(1, formValues.guests - 1)
-                )
-              }
-              className="p-2 border border-gray-300 rounded-l-lg hover:bg-gray-100"
-            >
-              -
-            </button>
-            <span
-              className={`px-4 py-2 border-t border-b ${
-                errors?.guests
-                  ? "border-red-500"
-                  : "border-gray-300"
-              } min-w-16 text-center`}
-            >
-              {formValues.guests}
-            </span>
-            <button
-              type="button"
-              onClick={() =>
-                handleCounterChange(
-                  "guests",
-                  formValues.guests + 1
-                )
-              }
-              className="p-2 border border-gray-300 rounded-r-lg hover:bg-gray-100"
-            >
-              +
-            </button>
-          </div>
-          {errors?.guests && (
-            <p className="text-sm text-red-500 mt-1">
-              {errors.guests}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Number of bedrooms
-          </label>
-          <div className="flex items-center">
-            <button
-              type="button"
-              onClick={() =>
-                handleCounterChange(
-                  "bedrooms",
-                  Math.max(1, formValues.bedrooms - 1)
-                )
-              }
-              className="p-2 border border-gray-300 rounded-l-lg hover:bg-gray-100"
-            >
-              -
-            </button>
-            <span
-              className={`px-4 py-2 border-t border-b ${
-                errors?.bedrooms
-                  ? "border-red-500"
-                  : "border-gray-300"
-              } min-w-16 text-center`}
-            >
-              {formValues.bedrooms}
-            </span>
-            <button
-              type="button"
-              onClick={() =>
-                handleCounterChange(
-                  "bedrooms",
-                  formValues.bedrooms + 1
-                )
-              }
-              className="p-2 border border-gray-300 rounded-r-lg hover:bg-gray-100"
-            >
-              +
-            </button>
-          </div>
-          {errors?.bedrooms && (
-            <p className="text-sm text-red-500 mt-1">
-              {errors.bedrooms}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Number of beds
-          </label>
-          <div className="flex items-center">
-            <button
-              type="button"
-              onClick={() =>
-                handleCounterChange(
-                  "beds",
-                  Math.max(1, formValues.beds - 1)
-                )
-              }
-              className="p-2 border border-gray-300 rounded-l-lg hover:bg-gray-100"
-            >
-              -
-            </button>
-            <span
-              className={`px-4 py-2 border-t border-b ${
-                errors?.beds
-                  ? "border-red-500"
-                  : "border-gray-300"
-              } min-w-16 text-center`}
-            >
-              {formValues.beds}
-            </span>
-            <button
-              type="button"
-              onClick={() =>
-                handleCounterChange(
-                  "beds",
-                  formValues.beds + 1
-                )
-              }
-              className="p-2 border border-gray-300 rounded-r-lg hover:bg-gray-100"
-            >
-              +
-            </button>
-          </div>
-          {errors?.beds && (
-            <p className="text-sm text-red-500 mt-1">
-              {errors.beds}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Number of bathrooms
-          </label>
-          <div className="flex items-center">
-            <button
-              type="button"
-              onClick={() =>
-                handleCounterChange(
-                  "baths",
-                  Math.max(1, formValues.baths - 1)
-                )
-              }
-              className="p-2 border border-gray-300 rounded-l-lg hover:bg-gray-100"
-            >
-              -
-            </button>
-            <span
-              className={`px-4 py-2 border-t border-b ${
-                errors?.baths
-                  ? "border-red-500"
-                  : "border-gray-300"
-              } min-w-16 text-center`}
-            >
-              {formValues.baths}
-            </span>
-            <button
-              type="button"
-              onClick={() =>
-                handleCounterChange(
-                  "baths",
-                  formValues.baths + 1
-                )
-              }
-              className="p-2 border border-gray-300 rounded-r-lg hover:bg-gray-100"
-            >
-              +
-            </button>
-          </div>
-          {errors?.baths && (
-            <p className="text-sm text-red-500 mt-1">
-              {errors.baths}
-            </p>
-          )}
-        </div>
+        {renderCounter(
+          "guests",
+          "Maximum number of guests"
+        )}
+        {renderCounter("bedrooms", "Number of bedrooms")}
+        {renderCounter("beds", "Number of beds")}
+        {renderCounter("baths", "Number of bathrooms")}
       </div>
 
       <div className="mt-8 flex justify-between">

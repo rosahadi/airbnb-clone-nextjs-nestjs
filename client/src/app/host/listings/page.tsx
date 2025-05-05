@@ -52,7 +52,7 @@ function MyPropertiesPage() {
   }
 
   const handleEdit = (propertyId: string) => {
-    router.push(`/listings/${propertyId}/edit`);
+    router.push(`/host/listings/${propertyId}`);
   };
 
   return (
