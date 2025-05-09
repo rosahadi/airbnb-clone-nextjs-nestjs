@@ -9,7 +9,42 @@ import { z } from "zod";
 export interface Property {
   id: string;
   name: string;
+  tagline: string;
+  category: string;
+  image: string;
+  country: string;
+  description: string;
   price: number;
+  guests: number;
+  bedrooms: number;
+  beds: number;
+  baths: number;
+  amenities: string;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  favorites?: Array<{
+    id: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  }>;
+  reviews?: Array<{
+    id: string;
+    rating: number;
+    comment: string;
+  }>;
+  bookings?: Array<{
+    id: string;
+    checkIn: string;
+    checkOut: string;
+  }>;
 }
 
 export type PropertyFormData = z.infer<
