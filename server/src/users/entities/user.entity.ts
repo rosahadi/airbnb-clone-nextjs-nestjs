@@ -10,9 +10,9 @@ import {
 import { Role } from '../role.enum';
 import * as crypto from 'crypto';
 import { Property } from 'src/property/entities/property.entity';
-import { Favorite } from 'src/property/entities/favorite.entity';
-import { Review } from 'src/property/entities/review.entity';
-import { Booking } from 'src/property/entities/booking.entity';
+import { Favorite } from 'src/favorite/favorite.entity';
+import { Review } from 'src/review/review.entity';
+import { Booking } from 'src/booking/booking.entity';
 
 @ObjectType()
 @Entity()

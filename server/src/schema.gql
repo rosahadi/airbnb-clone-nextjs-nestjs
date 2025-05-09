@@ -47,6 +47,11 @@ type Favorite {
   user: User!
 }
 
+type FavoriteStatusResponse {
+  favoriteId: String
+  isFavorite: Boolean!
+}
+
 input ForgotPasswordInput {
   email: String!
 }
@@ -58,6 +63,7 @@ input LoginInput {
 
 type Mutation {
   createProperty(createPropertyInput: CreatePropertyInput!): Property!
+  deleteFavorite(id: ID!): Favorite!
   deleteMe: User!
   deleteProperty(id: ID!): Property!
   deleteUser(id: ID!): User!
@@ -66,6 +72,7 @@ type Mutation {
   logout: Boolean!
   resetPassword(resetPasswordInput: ResetPasswordInput!): AuthResponse!
   signup(signupInput: SignupInput!): SignupResponse!
+  toggleFavorite(propertyId: ID!): Favorite
   updateMe(updateMeInput: UpdateMeInput!): User!
   updatePassword(updatePasswordInput: UpdatePasswordInput!): AuthResponse!
   updateProperty(id: ID!, updatePropertyInput: UpdatePropertyInput!): Property!
@@ -100,10 +107,13 @@ input PropertyFilterInput {
 }
 
 type Query {
+  async(id: ID!): Property!
+  checkFavoriteStatus(propertyId: ID!): FavoriteStatusResponse!
+  favorite(id: ID!): Favorite!
   me: User!
+  myFavorites: [Favorite!]!
   myProperties: [Property!]!
   properties(filters: PropertyFilterInput): [Property!]!
-  property(id: ID!): Property!
   user(id: ID!): User!
   users: [User!]!
 }

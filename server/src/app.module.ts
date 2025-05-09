@@ -20,10 +20,11 @@ import { emailConfig } from './config/email.config';
 import { cloudinaryConfig } from './config/cloudinary.config';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { Property } from './property/entities/property.entity';
-import { Favorite } from './property/entities/favorite.entity';
-import { Booking } from './property/entities/booking.entity';
-import { Review } from './property/entities/review.entity';
+import { Favorite } from './favorite/favorite.entity';
+import { Booking } from './booking/booking.entity';
+import { Review } from './review/review.entity';
 import { PropertyModule } from './property/property.module';
+import { FavoriteModule } from './favorite/favorite.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { PropertyModule } from './property/property.module';
     EmailModule,
     CloudinaryModule,
     PropertyModule,
+    FavoriteModule,
   ],
   controllers: [AppController],
   providers: [

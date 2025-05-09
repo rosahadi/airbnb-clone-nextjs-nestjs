@@ -26,9 +26,7 @@ export class PropertyResolver {
 
   @Public()
   @Query(() => Property)
-  async property(
-    @Args('id', { type: () => ID }) id: string,
-  ): Promise<Property> {
+  async(@Args('id', { type: () => ID }) id: string): Promise<Property> {
     return this.propertyService.findPropertyById(id);
   }
 

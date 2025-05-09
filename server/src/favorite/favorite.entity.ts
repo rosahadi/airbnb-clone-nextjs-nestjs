@@ -1,29 +1,20 @@
-import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import {
-  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Property } from './property.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Property } from 'src/property/entities/property.entity';
 
 @ObjectType()
 @Entity()
-export class Review {
+export class Favorite {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Field(() => Int)
-  @Column()
-  rating: number;
-
-  @Field()
-  @Column()
-  comment: string;
 
   @Field()
   @CreateDateColumn()
@@ -34,11 +25,11 @@ export class Review {
   updatedAt: Date;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.reviews, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.favorites, { onDelete: 'CASCADE' })
   user: User;
 
   @Field(() => Property)
-  @ManyToOne(() => Property, (property) => property.reviews, {
+  @ManyToOne(() => Property, (property) => property.favorites, {
     onDelete: 'CASCADE',
   })
   property: Property;

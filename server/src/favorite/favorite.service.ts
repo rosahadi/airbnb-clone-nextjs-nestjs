@@ -1,0 +1,144 @@
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Favorite } from './favorite.entity';
+import { User } from '../users/entities/user.entity';
+import { PropertyService } from '../property/property.service';
+import { FavoriteStatusResponse } from './dto/favorite-status.response';
+
+@Injectable()
+export class FavoriteService {
+  private readonly logger = new Logger(FavoriteService.name);
+
+  constructor(
+    @InjectRepository(Favorite)
+    private readonly favoriteRepository: Repository<Favorite>,
+    private readonly propertyService: PropertyService,
+  ) {}
+
+  async toggleFavorite(
+    user: User,
+    propertyId: string,
+  ): Promise<Favorite | null> {
+    try {
+      this.logger.log(
+        `Toggling favorite for property ID: ${propertyId} and user: ${user.id}`,
+      );
+
+      // Check if property exists
+      const property = await this.propertyService.findPropertyById(propertyId);
+
+      // Check if favorite already exists
+      const existingFavorite = await this.favoriteRepository.findOne({
+        where: {
+          user: { id: user.id },
+          property: { id: propertyId },
+        },
+        relations: ['user', 'property'],
+      });
+
+      // If favorite exists, remove it
+      if (existingFavorite) {
+        await this.favoriteRepository.remove(existingFavorite);
+        return null;
+      }
+
+      // Otherwise create new favorite
+      const favorite = this.favoriteRepository.create({
+        user,
+        property,
+      });
+
+      return await this.favoriteRepository.save(favorite);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new InternalServerErrorException(
+        `Failed to toggle favorite: ${errorMessage}`,
+      );
+    }
+  }
+
+  async getUserFavorites(userId: string): Promise<Favorite[]> {
+    try {
+      return await this.favoriteRepository.find({
+        where: { user: { id: userId } },
+        relations: ['user', 'property'],
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new InternalServerErrorException(
+        `Failed to get user favorites: ${errorMessage}`,
+      );
+    }
+  }
+
+  async getFavoriteById(id: string): Promise<Favorite> {
+    const favorite = await this.favoriteRepository.findOne({
+      where: { id },
+      relations: ['user', 'property'],
+    });
+
+    if (!favorite) {
+      throw new NotFoundException(`Favorite with ID ${id} not found`);
+    }
+
+    return favorite;
+  }
+
+  async checkFavoriteStatus(
+    userId: string,
+    propertyId: string,
+  ): Promise<FavoriteStatusResponse> {
+    try {
+      const favorite = await this.favoriteRepository.findOne({
+        where: {
+          user: { id: userId },
+          property: { id: propertyId },
+        },
+        select: ['id'],
+      });
+
+      return {
+        isFavorite: !!favorite,
+        favoriteId: favorite?.id || undefined,
+      };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new InternalServerErrorException(
+        `Failed to check favorite status: ${errorMessage}`,
+      );
+    }
+  }
+
+  async deleteFavorite(userId: string, favoriteId: string): Promise<Favorite> {
+    const favorite = await this.favoriteRepository.findOne({
+      where: {
+        id: favoriteId,
+        user: { id: userId },
+      },
+      relations: ['user', 'property'],
+    });
+
+    if (!favorite) {
+      throw new NotFoundException(
+        `Favorite with ID ${favoriteId} not found or you don't have permission to delete it`,
+      );
+    }
+
+    const deletedFavorite = { ...favorite };
+    await this.favoriteRepository.remove(favorite);
+    return deletedFavorite;
+  }
+}

@@ -8,10 +8,10 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { Favorite } from './favorite.entity';
-import { Review } from './review.entity';
-import { Booking } from './booking.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Favorite } from 'src/favorite/favorite.entity';
+import { Review } from 'src/review/review.entity';
+import { Booking } from 'src/booking/booking.entity';
 
 @ObjectType()
 @Entity()

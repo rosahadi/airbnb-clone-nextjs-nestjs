@@ -80,16 +80,27 @@ export class PropertyService {
 
   // Find property by ID
   async findPropertyById(id: string): Promise<Property> {
-    const property = await this.propertyRepository.findOne({
-      where: { id },
-      relations: ['user'],
-    });
+    try {
+      const property = await this.propertyRepository.findOne({
+        where: { id },
+        relations: ['user', 'favorites', 'reviews', 'bookings'],
+      });
 
-    if (!property) {
-      throw new NotFoundException(`Property with ID ${id} not found`);
+      if (!property) {
+        throw new NotFoundException(`Property with ID ${id} not found`);
+      }
+
+      return property;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new InternalServerErrorException(
+        `Error fetching property: ${errorMessage}`,
+      );
     }
-
-    return property;
   }
 
   async updateProperty(
@@ -99,6 +110,7 @@ export class PropertyService {
   ): Promise<Property> {
     const property = await this.propertyRepository.findOne({
       where: { id: propertyId, userId },
+      relations: ['user', 'favorites', 'reviews', 'bookings'],
     });
 
     if (!property) {
@@ -142,6 +154,7 @@ export class PropertyService {
   async deleteProperty(userId: string, propertyId: string): Promise<Property> {
     const property = await this.propertyRepository.findOne({
       where: { id: propertyId, userId },
+      relations: ['user'],
     });
 
     if (!property) {
@@ -159,6 +172,7 @@ export class PropertyService {
   async getUserProperties(userId: string): Promise<Property[]> {
     return this.propertyRepository.find({
       where: { userId },
+      relations: ['user'],
     });
   }
 }
