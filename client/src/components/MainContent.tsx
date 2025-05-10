@@ -9,5 +9,5 @@ interface MainContentProps {
 export const MainContent: React.FC<MainContentProps> = ({
   children,
 }) => {
-  return <main className="pt-20">{children}</main>;
+  return <main className="pt-20 pb-12">{children}</main>;
 };

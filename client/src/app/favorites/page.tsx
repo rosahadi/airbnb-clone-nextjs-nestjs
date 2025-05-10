@@ -7,18 +7,26 @@ import { useAuth } from "@/stores/authStore";
 import { toast } from "sonner";
 import Container from "@/components/Container";
 import { Favorite } from "@/types/favorite";
+import Loader from "@/components/Loader";
 
 function FavoritesPage() {
   const { isAuthenticated } = useAuth();
 
-  const { data, error } = useQuery(GET_MY_FAVORITES_QUERY, {
-    skip: !isAuthenticated,
-    onError: (error) => {
-      toast.error("Failed to fetch favorites", {
-        description: error.message,
-      });
-    },
-  });
+  const { data, error, loading } = useQuery(
+    GET_MY_FAVORITES_QUERY,
+    {
+      skip: !isAuthenticated,
+      onError: (error) => {
+        toast.error("Failed to fetch favorites", {
+          description: error.message,
+        });
+      },
+    }
+  );
+
+  if (loading) {
+    return <Loader />;
+  }
 
   if (error) {
     return (

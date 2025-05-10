@@ -25,7 +25,7 @@ export default function RootLayout({
           <AuthProvider>
             <Navbar />
             <Toaster />
-            <MainContent> {children}</MainContent>
+            <MainContent>{children}</MainContent>
           </AuthProvider>
         </ApolloWrapper>
       </body>

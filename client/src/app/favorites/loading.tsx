@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import LoadingCards from '@/components/card/LoadingCards';
+import Loader from "@/components/Loader";
 
 function loading() {
-  return <LoadingCards />;
+  return <Loader />;
 }
 export default loading;
