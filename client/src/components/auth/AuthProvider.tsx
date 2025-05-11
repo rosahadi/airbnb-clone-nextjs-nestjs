@@ -9,17 +9,18 @@ export function AuthProvider({
 }: {
   children: ReactNode;
 }) {
-  const { setUser, setIsAuthenticated, setIsLoading } =
-    useAuthStore();
+  const {
+    setUser,
+    setIsAuthenticated,
+    setIsLoading,
+    isAuthenticated,
+  } = useAuthStore();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data, loading, error } = useQuery(
-    GET_CURRENT_USER,
-    {
-      fetchPolicy: "network-only",
-      errorPolicy: "all",
-    }
-  );
+  const { data, loading } = useQuery(GET_CURRENT_USER, {
+    fetchPolicy: "network-only",
+    errorPolicy: "all",
+    skip: !isAuthenticated,
+  });
 
   useEffect(() => {
     setIsLoading(loading);
