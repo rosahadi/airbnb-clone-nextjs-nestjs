@@ -28,6 +28,7 @@ const PROPERTY_WITH_USER_FIELDS = gql`
       id
       name
       email
+      profileImage
     }
   }
 `;
