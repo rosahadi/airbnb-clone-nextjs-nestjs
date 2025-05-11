@@ -34,6 +34,12 @@ input CreatePropertyInput {
   tagline: String!
 }
 
+input CreateReviewInput {
+  comment: String!
+  propertyId: ID!
+  rating: Int!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -63,9 +69,11 @@ input LoginInput {
 
 type Mutation {
   createProperty(createPropertyInput: CreatePropertyInput!): Property!
+  createReview(createReviewInput: CreateReviewInput!): Review!
   deleteFavorite(id: ID!): Favorite!
   deleteMe: User!
   deleteProperty(id: ID!): Property!
+  deleteReview(id: ID!): Review!
   deleteUser(id: ID!): User!
   forgotPassword(forgotPasswordInput: ForgotPasswordInput!): Boolean!
   login(loginInput: LoginInput!): AuthResponse!
@@ -76,6 +84,7 @@ type Mutation {
   updateMe(updateMeInput: UpdateMeInput!): User!
   updatePassword(updatePasswordInput: UpdatePasswordInput!): AuthResponse!
   updateProperty(id: ID!, updatePropertyInput: UpdatePropertyInput!): Property!
+  updateReview(id: ID!, updateReviewInput: UpdateReviewInput!): Review!
   updateUser(id: ID!, updateUserInput: UpdateUserInput!): User!
   verifyEmail(token: String!): AuthResponse!
 }
@@ -106,14 +115,25 @@ input PropertyFilterInput {
   category: String
 }
 
+type PropertyRatingDto {
+  count: Int!
+  rating: Float!
+}
+
 type Query {
-  async(id: ID!): Property!
   checkFavoriteStatus(propertyId: ID!): FavoriteStatusResponse!
   favorite(id: ID!): Favorite!
   me: User!
   myFavorites: [Favorite!]!
   myProperties: [Property!]!
+  myPropertyReview(propertyId: ID!): Review
+  myReviews: [Review!]!
   properties(filters: PropertyFilterInput): [Property!]!
+  property(id: ID!): Property!
+  propertyRating(propertyId: ID!): PropertyRatingDto!
+  propertyReviews(propertyId: ID!): [Review!]!
+  review(id: ID!): Review!
+  reviews(filters: ReviewFilterInput): [Review!]!
   user(id: ID!): User!
   users: [User!]!
 }
@@ -132,6 +152,11 @@ type Review {
   rating: Int!
   updatedAt: DateTime!
   user: User!
+}
+
+input ReviewFilterInput {
+  propertyId: ID
+  userId: ID
 }
 
 input SignupInput {
@@ -170,6 +195,11 @@ input UpdatePropertyInput {
   name: String
   price: Int
   tagline: String
+}
+
+input UpdateReviewInput {
+  comment: String
+  rating: Int
 }
 
 input UpdateUserInput {

@@ -25,6 +25,7 @@ import { Booking } from './booking/booking.entity';
 import { Review } from './review/review.entity';
 import { PropertyModule } from './property/property.module';
 import { FavoriteModule } from './favorite/favorite.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { FavoriteModule } from './favorite/favorite.module';
     CloudinaryModule,
     PropertyModule,
     FavoriteModule,
+    ReviewModule,
   ],
   controllers: [AppController],
   providers: [
