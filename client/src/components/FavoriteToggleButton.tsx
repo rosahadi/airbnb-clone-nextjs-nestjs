@@ -102,7 +102,12 @@ export default function FavoriteToggleButton({
 
   if (loading) {
     return (
-      <Button variant="ghost" size="icon" disabled>
+      <Button
+        variant="outline"
+        size="icon"
+        className="p-2"
+        disabled
+      >
         <FaHeart className="animate-pulse text-gray-400" />
       </Button>
     );
@@ -114,16 +119,15 @@ export default function FavoriteToggleButton({
         <Button
           type="submit"
           size="icon"
-          variant="ghost"
+          variant="outline"
           disabled={form.formState.isSubmitting}
-          className="bg-white/90 hover:bg-white rounded-full h-8 w-8 shadow-md transition-all group"
+          className="p-2"
         >
           <FaHeart
-            size={18}
             className={
               isFavorite
-                ? "text-primary"
-                : "text-gray-400 group-hover:text-red-300"
+                ? "text-primary fill-primary"
+                : "text-gray-400 hover:text-red-300"
             }
           />
         </Button>
