@@ -83,7 +83,13 @@ export class PropertyService {
     try {
       const property = await this.propertyRepository.findOne({
         where: { id },
-        relations: ['user', 'favorites', 'reviews', 'bookings'],
+        relations: [
+          'user',
+          'favorites',
+          'favorites.user',
+          'reviews',
+          'bookings',
+        ],
       });
 
       if (!property) {

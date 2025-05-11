@@ -3,6 +3,7 @@ import {
   NotFoundException,
   InternalServerErrorException,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -26,6 +27,13 @@ export class FavoriteService {
     propertyId: string,
   ): Promise<Favorite | null> {
     try {
+      // First, verify we have a valid user
+      if (!user || !user.id) {
+        throw new UnauthorizedException(
+          'Valid user required to toggle favorites',
+        );
+      }
+
       this.logger.log(
         `Toggling favorite for property ID: ${propertyId} and user: ${user.id}`,
       );
@@ -54,9 +62,18 @@ export class FavoriteService {
         property,
       });
 
-      return await this.favoriteRepository.save(favorite);
+      const savedFavorite = await this.favoriteRepository.save(favorite);
+
+      // Now fetch the favorite with full relations to ensure all fields are populated
+      return await this.favoriteRepository.findOne({
+        where: { id: savedFavorite.id },
+        relations: ['user', 'property'],
+      });
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof UnauthorizedException
+      ) {
         throw error;
       }
 
@@ -69,6 +86,12 @@ export class FavoriteService {
   }
 
   async getUserFavorites(userId: string): Promise<Favorite[]> {
+    if (!userId) {
+      throw new UnauthorizedException(
+        'Valid user ID required to get favorites',
+      );
+    }
+
     try {
       return await this.favoriteRepository.find({
         where: { user: { id: userId } },
@@ -100,6 +123,10 @@ export class FavoriteService {
     userId: string,
     propertyId: string,
   ): Promise<FavoriteStatusResponse> {
+    if (!userId) {
+      return { isFavorite: false };
+    }
+
     try {
       const favorite = await this.favoriteRepository.findOne({
         where: {
@@ -123,6 +150,12 @@ export class FavoriteService {
   }
 
   async deleteFavorite(userId: string, favoriteId: string): Promise<Favorite> {
+    if (!userId) {
+      throw new UnauthorizedException(
+        'Valid user ID required to delete a favorite',
+      );
+    }
+
     const favorite = await this.favoriteRepository.findOne({
       where: {
         id: favoriteId,
