@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // List of paths that are public (don't require authentication)
-const publicPaths = ["/"];
+const publicPaths = [
+  "/",
+  "/properties",
+  "/properties/[id]",
+];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
