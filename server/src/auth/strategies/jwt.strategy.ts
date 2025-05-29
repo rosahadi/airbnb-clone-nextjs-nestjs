@@ -30,8 +30,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     const jwtFromRequest = (req: RequestWithCookies): string | null => {
       // First try to extract from cookie
-      if (req.cookies?.jwt) {
-        return req.cookies.jwt;
+      if (req.cookies?.airbnbCloneJWT) {
+        return req.cookies.airbnbCloneJWT;
       }
 
       // If not in cookie, try from auth header

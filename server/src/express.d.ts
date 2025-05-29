@@ -11,6 +11,6 @@ declare global {
 
 interface RequestWithCookies extends Request {
   cookies: {
-    jwt?: string;
+    airbnbCloneJWT?: string;
   };
 }

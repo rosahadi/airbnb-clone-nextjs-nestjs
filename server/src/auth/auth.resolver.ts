@@ -109,7 +109,7 @@ export class AuthResolver {
   // eslint-disable-next-line @typescript-eslint/require-await
   async logout(@Context() context: GqlContext): Promise<boolean> {
     // Clear the cookie with secure options
-    context.res.clearCookie('jwt', {
+    context.res.clearCookie('airbnbCloneJWT', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

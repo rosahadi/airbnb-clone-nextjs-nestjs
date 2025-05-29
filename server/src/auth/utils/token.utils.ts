@@ -22,7 +22,7 @@ export class TokenUtils {
     };
 
     // Set the cookie with the token
-    res.cookie('jwt', token, cookieOptions);
+    res.cookie('airbnbCloneJWT', token, cookieOptions);
   }
 
   createSendToken(
