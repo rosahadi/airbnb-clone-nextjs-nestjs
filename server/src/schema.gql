@@ -19,6 +19,12 @@ type Booking {
   user: User!
 }
 
+input CreateBookingInput {
+  checkIn: String!
+  checkOut: String!
+  propertyId: ID!
+}
+
 input CreatePropertyInput {
   amenities: String!
   baths: Int!
@@ -68,8 +74,10 @@ input LoginInput {
 }
 
 type Mutation {
+  createBooking(createBookingInput: CreateBookingInput!): Booking!
   createProperty(createPropertyInput: CreatePropertyInput!): Property!
   createReview(createReviewInput: CreateReviewInput!): Review!
+  deleteBooking(id: ID!): Booking!
   deleteFavorite(id: ID!): Favorite!
   deleteMe: User!
   deleteProperty(id: ID!): Property!
@@ -81,6 +89,7 @@ type Mutation {
   resetPassword(resetPasswordInput: ResetPasswordInput!): AuthResponse!
   signup(signupInput: SignupInput!): SignupResponse!
   toggleFavorite(propertyId: ID!): Favorite
+  updateBooking(id: ID!, updateBookingInput: UpdateBookingInput!): Booking!
   updateMe(updateMeInput: UpdateMeInput!): User!
   updatePassword(updatePasswordInput: UpdatePasswordInput!): AuthResponse!
   updateProperty(id: ID!, updatePropertyInput: UpdatePropertyInput!): Property!
@@ -121,15 +130,18 @@ type PropertyRatingDto {
 }
 
 type Query {
+  booking(id: ID!): Booking!
   checkFavoriteStatus(propertyId: ID!): FavoriteStatusResponse!
   favorite(id: ID!): Favorite!
   me: User!
+  myBookings: [Booking!]!
   myFavorites: [Favorite!]!
   myProperties: [Property!]!
   myPropertyReview(propertyId: ID!): Review
   myReviews: [Review!]!
   properties(filters: PropertyFilterInput): [Property!]!
   property(id: ID!): Property!
+  propertyBookings(propertyId: ID!): [Booking!]!
   propertyRating(propertyId: ID!): PropertyRatingDto!
   propertyReviews(propertyId: ID!): [Review!]!
   review(id: ID!): Review!
@@ -168,6 +180,13 @@ input SignupInput {
 
 type SignupResponse {
   message: String!
+}
+
+input UpdateBookingInput {
+  checkIn: String
+  checkOut: String
+  paymentStatus: Boolean
+  propertyId: ID
 }
 
 input UpdateMeInput {

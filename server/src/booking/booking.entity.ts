@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Property } from 'src/property/entities/property.entity';
@@ -47,11 +48,19 @@ export class Booking {
 
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.bookings, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
   user: User;
+
+  @Column()
+  userId: string;
 
   @Field(() => Property)
   @ManyToOne(() => Property, (property) => property.bookings, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'propertyId' })
   property: Property;
+
+  @Column()
+  propertyId: string;
 }

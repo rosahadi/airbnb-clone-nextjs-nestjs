@@ -26,6 +26,7 @@ import { Review } from './review/review.entity';
 import { PropertyModule } from './property/property.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { ReviewModule } from './review/review.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { ReviewModule } from './review/review.module';
     PropertyModule,
     FavoriteModule,
     ReviewModule,
+    BookingModule,
   ],
   controllers: [AppController],
   providers: [
