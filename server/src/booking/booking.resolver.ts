@@ -7,6 +7,12 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { VerifiedEmailGuard } from '../auth/guards/verified-email.guard';
 import { CreateBookingInput } from './dto/create-booking.input';
 import { UpdateBookingInput } from './dto/update-booking.input';
+import {
+  ReservationStats,
+  ReservationStatsDto,
+} from './dto/reservation-stats.dto';
+import { AppStats, AppStatsDto } from './dto/app-stats.dto';
+import { ChartData, ChartDataDto } from './dto/chart-data.dto';
 
 @Resolver(() => Booking)
 export class BookingResolver {
@@ -27,6 +33,36 @@ export class BookingResolver {
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Booking> {
     return this.bookingService.findBookingById(id, user.id);
+  }
+
+  // ---- Host Reservations ----
+
+  @Query(() => [Booking])
+  @UseGuards(VerifiedEmailGuard)
+  async hostReservations(@CurrentUser() user: User): Promise<Booking[]> {
+    return this.bookingService.getHostReservations(user.id);
+  }
+
+  @Query(() => ReservationStatsDto)
+  @UseGuards(VerifiedEmailGuard)
+  async hostReservationStats(
+    @CurrentUser() user: User,
+  ): Promise<ReservationStats> {
+    return this.bookingService.getHostReservationStats(user.id);
+  }
+
+  // ---- App Statistics ----
+
+  @Query(() => AppStatsDto)
+  @UseGuards(VerifiedEmailGuard)
+  async appStats(): Promise<AppStats> {
+    return this.bookingService.getAppStats();
+  }
+
+  @Query(() => [ChartDataDto])
+  @UseGuards(VerifiedEmailGuard)
+  async chartsData(): Promise<ChartData[]> {
+    return this.bookingService.getChartsData();
   }
 
   // ---- Mutations ----

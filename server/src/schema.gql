@@ -2,6 +2,12 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AppStatsDto {
+  bookingsCount: Int!
+  propertiesCount: Int!
+  usersCount: Int!
+}
+
 type AuthResponse {
   user: User!
 }
@@ -17,6 +23,11 @@ type Booking {
   totalNights: Int!
   updatedAt: DateTime!
   user: User!
+}
+
+type ChartDataDto {
+  count: Int!
+  date: String!
 }
 
 input CreateBookingInput {
@@ -130,9 +141,13 @@ type PropertyRatingDto {
 }
 
 type Query {
+  appStats: AppStatsDto!
   booking(id: ID!): Booking!
+  chartsData: [ChartDataDto!]!
   checkFavoriteStatus(propertyId: ID!): FavoriteStatusResponse!
   favorite(id: ID!): Favorite!
+  hostReservationStats: ReservationStatsDto!
+  hostReservations: [Booking!]!
   me: User!
   myBookings: [Booking!]!
   myFavorites: [Favorite!]!
@@ -141,13 +156,18 @@ type Query {
   myReviews: [Review!]!
   properties(filters: PropertyFilterInput): [Property!]!
   property(id: ID!): Property!
-  propertyBookings(propertyId: ID!): [Booking!]!
   propertyRating(propertyId: ID!): PropertyRatingDto!
   propertyReviews(propertyId: ID!): [Review!]!
   review(id: ID!): Review!
   reviews(filters: ReviewFilterInput): [Review!]!
   user(id: ID!): User!
   users: [User!]!
+}
+
+type ReservationStatsDto {
+  amount: Int!
+  nights: Int!
+  properties: Int!
 }
 
 input ResetPasswordInput {
