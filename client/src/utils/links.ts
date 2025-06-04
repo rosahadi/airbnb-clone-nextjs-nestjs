@@ -7,7 +7,6 @@ export const links: NavLink[] = [
   { href: "/", label: "home" },
   { href: "/favorites", label: "favorites" },
   { href: "/trips", label: "your trips" },
-  { href: "/reviews", label: "your reviews" },
   {
     href: "/host/reservations",
     label: "your reservations",

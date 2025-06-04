@@ -11,7 +11,9 @@ const publicPaths = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const authToken = request.cookies.get("jwt")?.value;
+  const authToken = request.cookies.get(
+    "airbnbCloneJWT"
+  )?.value;
   const isAuthenticated = !!authToken;
 
   // Check if the path is NOT public and user is not authenticated
