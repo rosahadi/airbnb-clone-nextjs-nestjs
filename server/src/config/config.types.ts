@@ -4,6 +4,7 @@ import { AuthConfig } from './auth.config';
 import { FrontendConfig } from './frontend.config';
 import { EmailConfig } from './email.config';
 import { CloudinaryConfig } from './cloudinary.config';
+import { StripeConfig } from './stripe.config';
 
 export interface ConfigType {
   database: TypeOrmModuleOptions;
@@ -11,6 +12,7 @@ export interface ConfigType {
   frontend: FrontendConfig;
   email: EmailConfig;
   cloudinary: CloudinaryConfig;
+  stripe: StripeConfig;
 }
 
 export const appConfigSchema = Joi.object({
@@ -36,4 +38,8 @@ export const appConfigSchema = Joi.object({
   CLOUDINARY_BASE_FOLDER: Joi.string().default('airbnb'),
   CLOUDINARY_PROFILE_SIZE_LIMIT: Joi.number().default(5 * 1024 * 1024), // 5MB
   CLOUDINARY_PROPERTY_SIZE_LIMIT: Joi.number().default(10 * 1024 * 1024), // 10MB
+
+  STRIPE_SECRET_KEY: Joi.string().required(),
+  STRIPE_PUBLISHABLE_KEY: Joi.string().required(),
+  STRIPE_WEBHOOK_SECRET: Joi.string().required(),
 });
