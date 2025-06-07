@@ -27,6 +27,7 @@ import { PropertyModule } from './property/property.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { ReviewModule } from './review/review.module';
 import { BookingModule } from './booking/booking.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { BookingModule } from './booking/booking.module';
     FavoriteModule,
     ReviewModule,
     BookingModule,
+    StripeModule,
   ],
   controllers: [AppController],
   providers: [
