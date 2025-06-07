@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { FrontendConfig } from './config/frontend.config';
@@ -16,6 +16,12 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       whitelist: true,
+      forbidNonWhitelisted: true,
+      disableErrorMessages: false,
+      exceptionFactory: (errors) => {
+        console.log('Validation errors:', errors);
+        return new BadRequestException(errors);
+      },
     }),
   );
 

@@ -15,11 +15,18 @@ type AuthResponse {
 type Booking {
   checkIn: DateTime!
   checkOut: DateTime!
+  cleaning: Int!
   createdAt: DateTime!
   id: ID!
   orderTotal: Int!
+  paymentCompletedAt: DateTime
   paymentStatus: Boolean!
   property: Property!
+  service: Int!
+  stripePaymentIntentId: String
+  stripeSessionId: String
+  subTotal: Int!
+  tax: Int!
   totalNights: Int!
   updatedAt: DateTime!
   user: User!
@@ -30,10 +37,18 @@ type ChartDataDto {
   date: String!
 }
 
+input ConfirmPaymentInput {
+  sessionId: String!
+}
+
 input CreateBookingInput {
   checkIn: String!
   checkOut: String!
   propertyId: ID!
+}
+
+input CreatePaymentSessionInput {
+  bookingId: ID!
 }
 
 input CreatePropertyInput {
@@ -85,7 +100,9 @@ input LoginInput {
 }
 
 type Mutation {
+  confirmPayment(confirmPaymentInput: ConfirmPaymentInput!): Booking!
   createBooking(createBookingInput: CreateBookingInput!): Booking!
+  createPaymentSession(createPaymentSessionInput: CreatePaymentSessionInput!): PaymentSessionDto!
   createProperty(createPropertyInput: CreatePropertyInput!): Property!
   createReview(createReviewInput: CreateReviewInput!): Review!
   deleteBooking(id: ID!): Booking!
@@ -100,13 +117,17 @@ type Mutation {
   resetPassword(resetPasswordInput: ResetPasswordInput!): AuthResponse!
   signup(signupInput: SignupInput!): SignupResponse!
   toggleFavorite(propertyId: ID!): Favorite
-  updateBooking(id: ID!, updateBookingInput: UpdateBookingInput!): Booking!
   updateMe(updateMeInput: UpdateMeInput!): User!
   updatePassword(updatePasswordInput: UpdatePasswordInput!): AuthResponse!
   updateProperty(id: ID!, updatePropertyInput: UpdatePropertyInput!): Property!
   updateReview(id: ID!, updateReviewInput: UpdateReviewInput!): Review!
   updateUser(id: ID!, updateUserInput: UpdateUserInput!): User!
   verifyEmail(token: String!): AuthResponse!
+}
+
+type PaymentSessionDto {
+  clientSecret: String!
+  sessionId: String!
 }
 
 type Property {
@@ -143,6 +164,7 @@ type PropertyRatingDto {
 type Query {
   appStats: AppStatsDto!
   booking(id: ID!): Booking!
+  bookingBySessionId(sessionId: String!): Booking
   chartsData: [ChartDataDto!]!
   checkFavoriteStatus(propertyId: ID!): FavoriteStatusResponse!
   favorite(id: ID!): Favorite!
@@ -200,13 +222,6 @@ input SignupInput {
 
 type SignupResponse {
   message: String!
-}
-
-input UpdateBookingInput {
-  checkIn: String
-  checkOut: String
-  paymentStatus: Boolean
-  propertyId: ID
 }
 
 input UpdateMeInput {

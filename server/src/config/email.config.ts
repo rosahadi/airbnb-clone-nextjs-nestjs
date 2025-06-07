@@ -9,6 +9,6 @@ export const emailConfig = registerAs(
   'email',
   (): EmailConfig => ({
     resendApiKey: process.env.RESEND_API_KEY as string,
-    fromEmail: process.env.FROM_EMAIL ?? 'Taskard <no-reply@rosah.dev>',
+    fromEmail: process.env.FROM_EMAIL ?? 'Airbnb-clone <no-reply@rosah.dev>',
   }),
 );

@@ -19,7 +19,23 @@ export class Booking {
   id: string;
 
   @Field(() => Int)
-  @Column()
+  @Column('int')
+  subTotal: number;
+
+  @Field(() => Int)
+  @Column('int')
+  cleaning: number;
+
+  @Field(() => Int)
+  @Column('int')
+  service: number;
+
+  @Field(() => Int)
+  @Column('int')
+  tax: number;
+
+  @Field(() => Int)
+  @Column('int')
   orderTotal: number;
 
   @Field(() => Int)
@@ -37,6 +53,20 @@ export class Booking {
   @Field()
   @Column({ default: false })
   paymentStatus: boolean;
+
+  // Store Stripe session ID for tracking and debugging
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  stripeSessionId?: string;
+
+  // Store payment intent ID for refunds and advanced operations
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  stripePaymentIntentId?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  paymentCompletedAt?: Date;
 
   @Field()
   @CreateDateColumn()

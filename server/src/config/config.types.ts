@@ -30,7 +30,7 @@ export const appConfigSchema = Joi.object({
   JWT_COOKIE_EXPIRES_IN: Joi.number().default(90),
   CLIENT_URL: Joi.string().uri().default('http://localhost:3000'),
   RESEND_API_KEY: Joi.string().required(),
-  FROM_EMAIL: Joi.string().email().default('Taskard <no-reply@rosah.dev>'),
+  FROM_EMAIL: Joi.string().email().default('Airbnb-clone <no-reply@rosah.dev>'),
 
   CLOUDINARY_CLOUD_NAME: Joi.string().required(),
   CLOUDINARY_API_KEY: Joi.string().required(),
