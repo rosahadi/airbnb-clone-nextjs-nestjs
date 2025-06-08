@@ -15,11 +15,20 @@ const Navbar: React.FC<NavbarProps> = () => {
       <div className="py-4 border-b-[1px]">
         <Container>
           <div className="flex items-center justify-between gap-3">
-            <Logo />
-            <div className="flex-1 max-w-[34.4rem] mx-auto px-2">
+            <div className="flex-shrink-0">
+              <Logo />
+            </div>
+
+            <div className="hidden lg:block flex-1 max-w-[34.4rem] mx-auto px-2">
               <NavSearch />
             </div>
-            <LinksDropdown />
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="lg:hidden">
+                <NavSearch />
+              </div>
+
+              <LinksDropdown />
+            </div>
           </div>
         </Container>
       </div>
