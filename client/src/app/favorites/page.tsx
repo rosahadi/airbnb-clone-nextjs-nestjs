@@ -40,7 +40,7 @@ function FavoritesPage() {
   const favorites = data?.myFavorites || [];
 
   if (favorites.length === 0) {
-    return <EmptyList />;
+    return <EmptyList message="" />;
   }
 
   const favoriteProperties = favorites.map(
