@@ -1,11 +1,14 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 @ObjectType()
 export class WebhookEventDto {
   @Field()
   type: string;
 
-  @Field({ nullable: true })
+  @Field()
+  timestamp: Date;
+
+  @Field(() => ID, { nullable: true })
   bookingId?: string;
 
   @Field({ nullable: true })
@@ -16,7 +19,4 @@ export class WebhookEventDto {
 
   @Field({ nullable: true })
   error?: string;
-
-  @Field()
-  timestamp: Date;
 }

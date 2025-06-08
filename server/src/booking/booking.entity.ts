@@ -1,4 +1,4 @@
-import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ID, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +10,17 @@ import {
 } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Property } from 'src/property/entities/property.entity';
+
+export enum BookingStatus {
+  PENDING_PAYMENT = 'pending_payment',
+  CONFIRMED = 'confirmed',
+  CANCELLED = 'cancelled',
+  COMPLETED = 'completed',
+}
+
+registerEnumType(BookingStatus, {
+  name: 'BookingStatus',
+});
 
 @ObjectType()
 @Entity()
@@ -50,16 +61,22 @@ export class Booking {
   @Column()
   checkOut: Date;
 
+  @Field(() => BookingStatus)
+  @Column({
+    type: 'enum',
+    enum: BookingStatus,
+    default: BookingStatus.PENDING_PAYMENT,
+  })
+  status: BookingStatus;
+
   @Field()
   @Column({ default: false })
   paymentStatus: boolean;
 
-  // Store Stripe session ID for tracking and debugging
   @Field({ nullable: true })
   @Column({ nullable: true })
   stripeSessionId?: string;
 
-  // Store payment intent ID for refunds and advanced operations
   @Field({ nullable: true })
   @Column({ nullable: true })
   stripePaymentIntentId?: string;
@@ -67,6 +84,11 @@ export class Booking {
   @Field({ nullable: true })
   @Column({ nullable: true })
   paymentCompletedAt?: Date;
+
+  // Expiration time for pending bookings
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  expiresAt?: Date;
 
   @Field()
   @CreateDateColumn()

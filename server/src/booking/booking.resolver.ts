@@ -5,7 +5,7 @@ import { Booking } from './booking.entity';
 import { User } from '../users/entities/user.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { VerifiedEmailGuard } from '../auth/guards/verified-email.guard';
-import { CreateBookingInput } from './dto/create-booking.input';
+import { CreateBookingWithPaymentInput } from './dto/create-booking-with-payment.input';
 import {
   ReservationStats,
   ReservationStatsDto,
@@ -13,7 +13,6 @@ import {
 import { AppStats, AppStatsDto } from './dto/app-stats.dto';
 import { ChartData, ChartDataDto } from './dto/chart-data.dto';
 import { PaymentSessionDto } from './dto/payment-session.dto';
-import { CreatePaymentSessionInput } from './dto/create-payment-session.input';
 import { ConfirmPaymentInput } from './dto/confirm-payment.input';
 
 @Resolver(() => Booking)
@@ -77,38 +76,26 @@ export class BookingResolver {
 
   // ---- Mutations ----
 
-  @Mutation(() => Booking)
+  @Mutation(() => PaymentSessionDto)
   @UseGuards(VerifiedEmailGuard)
-  async createBooking(
+  async createBookingWithPayment(
     @CurrentUser() user: User,
-    @Args('createBookingInput') createBookingInput: CreateBookingInput,
-  ): Promise<Booking> {
-    return this.bookingService.createBooking(user, createBookingInput);
+    @Args('createBookingWithPaymentInput')
+    createBookingWithPaymentInput: CreateBookingWithPaymentInput,
+  ): Promise<PaymentSessionDto> {
+    return this.bookingService.createBookingWithPayment(
+      user,
+      createBookingWithPaymentInput,
+    );
   }
 
   @Mutation(() => Booking)
   @UseGuards(VerifiedEmailGuard)
-  async deleteBooking(
+  async cancelBooking(
     @CurrentUser() user: User,
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Booking> {
-    return this.bookingService.deleteBooking(user.id, id);
-  }
-
-  @Mutation(() => PaymentSessionDto)
-  @UseGuards(VerifiedEmailGuard)
-  async createPaymentSession(
-    @CurrentUser() user: User,
-    @Args('createPaymentSessionInput')
-    createPaymentSessionInput: CreatePaymentSessionInput,
-  ): Promise<PaymentSessionDto> {
-    console.log('createPaymentSession called with:', createPaymentSessionInput);
-    console.log('User:', user);
-
-    return this.bookingService.createPaymentSession(
-      user.id,
-      createPaymentSessionInput,
-    );
+    return this.bookingService.cancelBooking(user.id, id);
   }
 
   @Mutation(() => Booking)

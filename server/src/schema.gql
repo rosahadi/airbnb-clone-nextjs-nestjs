@@ -17,12 +17,14 @@ type Booking {
   checkOut: DateTime!
   cleaning: Int!
   createdAt: DateTime!
+  expiresAt: DateTime
   id: ID!
   orderTotal: Int!
   paymentCompletedAt: DateTime
   paymentStatus: Boolean!
   property: Property!
   service: Int!
+  status: BookingStatus!
   stripePaymentIntentId: String
   stripeSessionId: String
   subTotal: Int!
@@ -30,6 +32,13 @@ type Booking {
   totalNights: Int!
   updatedAt: DateTime!
   user: User!
+}
+
+enum BookingStatus {
+  CANCELLED
+  COMPLETED
+  CONFIRMED
+  PENDING_PAYMENT
 }
 
 type ChartDataDto {
@@ -41,14 +50,10 @@ input ConfirmPaymentInput {
   sessionId: String!
 }
 
-input CreateBookingInput {
+input CreateBookingWithPaymentInput {
   checkIn: String!
   checkOut: String!
   propertyId: ID!
-}
-
-input CreatePaymentSessionInput {
-  bookingId: ID!
 }
 
 input CreatePropertyInput {
@@ -100,12 +105,11 @@ input LoginInput {
 }
 
 type Mutation {
+  cancelBooking(id: ID!): Booking!
   confirmPayment(confirmPaymentInput: ConfirmPaymentInput!): Booking!
-  createBooking(createBookingInput: CreateBookingInput!): Booking!
-  createPaymentSession(createPaymentSessionInput: CreatePaymentSessionInput!): PaymentSessionDto!
+  createBookingWithPayment(createBookingWithPaymentInput: CreateBookingWithPaymentInput!): PaymentSessionDto!
   createProperty(createPropertyInput: CreatePropertyInput!): Property!
   createReview(createReviewInput: CreateReviewInput!): Review!
-  deleteBooking(id: ID!): Booking!
   deleteFavorite(id: ID!): Favorite!
   deleteMe: User!
   deleteProperty(id: ID!): Property!
@@ -126,6 +130,7 @@ type Mutation {
 }
 
 type PaymentSessionDto {
+  bookingId: ID!
   clientSecret: String!
   sessionId: String!
 }

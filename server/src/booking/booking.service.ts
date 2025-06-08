@@ -5,14 +5,13 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
-import { Booking } from './booking.entity';
+import { FindOptionsWhere, Repository, LessThan } from 'typeorm';
+import { Booking, BookingStatus } from './booking.entity';
 import { Property } from '../property/entities/property.entity';
 import { User } from '../users/entities/user.entity';
 import { StripeService } from '../stripe/stripe.service';
 import { EmailService } from '../email/email.service';
-import { CreateBookingInput } from './dto/create-booking.input';
-import { CreatePaymentSessionInput } from './dto/create-payment-session.input';
+import { CreateBookingWithPaymentInput } from './dto/create-booking-with-payment.input';
 import { ConfirmPaymentInput } from './dto/confirm-payment.input';
 import { ReservationStats } from './dto/reservation-stats.dto';
 import { AppStats } from './dto/app-stats.dto';
@@ -20,6 +19,7 @@ import { ChartData } from './dto/chart-data.dto';
 import Stripe from 'stripe';
 import { WebhookEventDto } from './dto/webhook-event.dto';
 import { PaymentSessionDto } from './dto/payment-session.dto';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class BookingService {
@@ -92,10 +92,41 @@ export class BookingService {
     return 'Unknown error';
   }
 
-  async createBooking(
+  private getExpirationTime(): Date {
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 30);
+    return expiresAt;
+  }
+
+  private async checkDateAvailability(
+    propertyId: string,
+    checkIn: Date,
+    checkOut: Date,
+    excludeBookingId?: string,
+  ): Promise<boolean> {
+    let queryBuilder = this.bookingRepository
+      .createQueryBuilder('booking')
+      .where('booking.propertyId = :propertyId', { propertyId })
+      .andWhere('booking.status = :status', { status: BookingStatus.CONFIRMED })
+      .andWhere(
+        '(booking.checkIn < :checkOut AND booking.checkOut > :checkIn)',
+        { checkIn, checkOut },
+      );
+
+    if (excludeBookingId) {
+      queryBuilder = queryBuilder.andWhere('booking.id != :excludeBookingId', {
+        excludeBookingId,
+      });
+    }
+
+    const overlappingBooking = await queryBuilder.getOne();
+    return !overlappingBooking;
+  }
+
+  async createBookingWithPayment(
     user: User,
-    createBookingInput: CreateBookingInput,
-  ): Promise<Booking> {
+    createBookingInput: CreateBookingWithPaymentInput,
+  ): Promise<PaymentSessionDto> {
     try {
       const { propertyId, checkIn, checkOut } = createBookingInput;
 
@@ -104,27 +135,17 @@ export class BookingService {
 
       this.validateBookingDates(checkInDate, checkOutDate);
 
-      const existingBooking = await this.bookingRepository.findOne({
-        where: {
-          property: { id: propertyId },
-          paymentStatus: true,
-          checkIn: checkInDate,
-          checkOut: checkOutDate,
-        },
-      });
+      const isAvailable = await this.checkDateAvailability(
+        propertyId,
+        checkInDate,
+        checkOutDate,
+      );
 
-      if (existingBooking) {
+      if (!isAvailable) {
         throw new BadRequestException(
-          'Property is already booked for these dates',
+          'Property is not available for these dates',
         );
       }
-
-      // Clean up any existing unpaid bookings for this user and property
-      await this.bookingRepository.delete({
-        user: { id: user.id },
-        property: { id: propertyId },
-        paymentStatus: false,
-      });
 
       const property = await this.propertyRepository.findOne({
         where: { id: propertyId },
@@ -133,6 +154,9 @@ export class BookingService {
       if (!property) {
         throw new NotFoundException('Property not found');
       }
+
+      // Clean up any existing expired/pending bookings for this user and property
+      await this.cleanupUserPendingBookings(user.id, propertyId);
 
       const { totalNights, subTotal, cleaning, service, tax, orderTotal } =
         this.calculateTotals(checkInDate, checkOutDate, property.price);
@@ -146,25 +170,33 @@ export class BookingService {
         service,
         tax,
         orderTotal,
+        status: BookingStatus.PENDING_PAYMENT,
         paymentStatus: false,
+        expiresAt: this.getExpirationTime(),
         user,
         property,
       });
 
       const savedBooking = await this.bookingRepository.save(newBooking);
 
-      const booking = await this.bookingRepository.findOne({
-        where: { id: savedBooking.id },
-        relations: ['user', 'property'],
-      });
+      const sessionData = await this.stripeService.createCheckoutSession(
+        savedBooking.id,
+        orderTotal,
+        totalNights,
+        checkInDate,
+        checkOutDate,
+        property.name,
+        property.image || '',
+      );
 
-      if (!booking) {
-        throw new NotFoundException(
-          `Booking with ID ${savedBooking.id} not found`,
-        );
-      }
+      savedBooking.stripeSessionId = sessionData.sessionId;
+      await this.bookingRepository.save(savedBooking);
 
-      return booking;
+      return {
+        clientSecret: sessionData.clientSecret,
+        sessionId: sessionData.sessionId,
+        bookingId: savedBooking.id,
+      };
     } catch (error: unknown) {
       if (
         error instanceof NotFoundException ||
@@ -177,6 +209,38 @@ export class BookingService {
       throw new InternalServerErrorException(
         `Failed to create booking: ${errorMessage}`,
       );
+    }
+  }
+
+  private async cleanupUserPendingBookings(
+    userId: string,
+    propertyId: string,
+  ): Promise<void> {
+    await this.bookingRepository.delete({
+      user: { id: userId },
+      property: { id: propertyId },
+      status: BookingStatus.PENDING_PAYMENT,
+    });
+  }
+
+  // Cleanup expired bookings - runs every 30 minutes
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  @Cron(CronExpression.EVERY_30_MINUTES)
+  async cleanupExpiredBookings(): Promise<void> {
+    try {
+      const expiredBookings = await this.bookingRepository.find({
+        where: {
+          status: BookingStatus.PENDING_PAYMENT,
+          expiresAt: LessThan(new Date()),
+        },
+      });
+
+      if (expiredBookings.length > 0) {
+        await this.bookingRepository.remove(expiredBookings);
+        console.log(`Cleaned up ${expiredBookings.length} expired bookings`);
+      }
+    } catch (error) {
+      console.error('Error cleaning up expired bookings:', error);
     }
   }
 
@@ -227,7 +291,7 @@ export class BookingService {
     }
   }
 
-  async deleteBooking(userId: string, bookingId: string): Promise<Booking> {
+  async cancelBooking(userId: string, bookingId: string): Promise<Booking> {
     const booking = await this.bookingRepository.findOne({
       where: { id: bookingId, user: { id: userId } },
       relations: ['user', 'property'],
@@ -235,13 +299,20 @@ export class BookingService {
 
     if (!booking) {
       throw new NotFoundException(
-        `Booking with ID ${bookingId} not found or you don't have permission to delete it`,
+        `Booking with ID ${bookingId} not found or you don't have permission to cancel it`,
       );
     }
 
-    const deletedBooking = { ...booking };
-    await this.bookingRepository.remove(booking);
-    return deletedBooking;
+    // Only allow cancellation of pending or confirmed bookings
+    if (
+      booking.status === BookingStatus.CANCELLED ||
+      booking.status === BookingStatus.COMPLETED
+    ) {
+      throw new BadRequestException('Cannot cancel this booking');
+    }
+
+    booking.status = BookingStatus.CANCELLED;
+    return await this.bookingRepository.save(booking);
   }
 
   // ========== HOST FUNCTIONALITY ==========
@@ -250,7 +321,7 @@ export class BookingService {
     try {
       return await this.bookingRepository.find({
         where: {
-          paymentStatus: true,
+          status: BookingStatus.CONFIRMED,
           property: {
             userId: hostId,
           },
@@ -265,6 +336,7 @@ export class BookingService {
           totalNights: true,
           checkIn: true,
           checkOut: true,
+          status: true,
           paymentStatus: true,
           createdAt: true,
           updatedAt: true,
@@ -296,7 +368,7 @@ export class BookingService {
         this.propertyRepository.count(),
         this.bookingRepository.count({
           where: {
-            paymentStatus: true,
+            status: BookingStatus.CONFIRMED,
           },
         }),
       ]);
@@ -322,9 +394,7 @@ export class BookingService {
 
       const bookings = await this.bookingRepository
         .createQueryBuilder('booking')
-        .where('booking.paymentStatus = :paymentStatus', {
-          paymentStatus: true,
-        })
+        .where('booking.status = :status', { status: BookingStatus.CONFIRMED })
         .andWhere('booking.createdAt >= :sixMonthsAgo', { sixMonthsAgo })
         .orderBy('booking.createdAt', 'ASC')
         .getMany();
@@ -363,8 +433,8 @@ export class BookingService {
         .addSelect('SUM(booking.totalNights)', 'totalNights')
         .innerJoin('booking.property', 'property')
         .where('property.userId = :hostId', { hostId })
-        .andWhere('booking.paymentStatus = :paymentStatus', {
-          paymentStatus: true,
+        .andWhere('booking.status = :status', {
+          status: BookingStatus.CONFIRMED,
         })
         .getRawOne<{
           totalAmount: string | null;
@@ -385,66 +455,6 @@ export class BookingService {
   }
 
   // ========== PAYMENT FUNCTIONALITY ==========
-
-  async createPaymentSession(
-    userId: string,
-    createPaymentSessionInput: CreatePaymentSessionInput,
-  ): Promise<PaymentSessionDto> {
-    const { bookingId } = createPaymentSessionInput;
-
-    try {
-      const booking = await this.bookingRepository.findOne({
-        where: { id: bookingId, userId },
-        relations: ['property', 'user'],
-      });
-
-      if (!booking) {
-        throw new Error('Booking not found or unauthorized');
-      }
-
-      if (booking.paymentStatus) {
-        throw new Error('Booking is already paid');
-      }
-
-      if (booking.stripeSessionId) {
-        const isExpired = await this.stripeService.isSessionExpired(
-          booking.stripeSessionId,
-        );
-        if (!isExpired) {
-          const existingSession = await this.stripeService.retrieveSession(
-            booking.stripeSessionId,
-          );
-          if (existingSession.client_secret) {
-            return {
-              clientSecret: existingSession.client_secret,
-              sessionId: existingSession.id,
-            };
-          }
-        }
-      }
-
-      const sessionData = await this.stripeService.createCheckoutSession(
-        booking.id,
-        booking.orderTotal,
-        booking.totalNights,
-        booking.checkIn,
-        booking.checkOut,
-        booking.property.name,
-        booking.property.image || '',
-      );
-
-      booking.stripeSessionId = sessionData.sessionId;
-      await this.bookingRepository.save(booking);
-
-      return {
-        clientSecret: sessionData.clientSecret,
-        sessionId: sessionData.sessionId,
-      };
-    } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      throw new Error(`Failed to create payment session: ${errorMessage}`);
-    }
-  }
 
   async confirmPayment(
     confirmPaymentInput: ConfirmPaymentInput,
@@ -477,7 +487,7 @@ export class BookingService {
         throw new Error('Booking not found for this session');
       }
 
-      if (booking.paymentStatus) {
+      if (booking.status === BookingStatus.CONFIRMED) {
         return booking;
       }
 
@@ -486,9 +496,26 @@ export class BookingService {
         throw new Error('No payment intent found in session');
       }
 
+      // Final availability check before confirming
+      const isStillAvailable = await this.checkDateAvailability(
+        booking.property.id,
+        booking.checkIn,
+        booking.checkOut,
+        booking.id,
+      );
+
+      if (!isStillAvailable) {
+        // Cancel the booking and refund if property is no longer available
+        booking.status = BookingStatus.CANCELLED;
+        await this.bookingRepository.save(booking);
+        throw new Error('Property is no longer available for these dates');
+      }
+
+      booking.status = BookingStatus.CONFIRMED;
       booking.paymentStatus = true;
       booking.stripePaymentIntentId = paymentIntent.id;
       booking.paymentCompletedAt = new Date();
+      booking.expiresAt = undefined;
 
       const updatedBooking = await this.bookingRepository.save(booking);
 
@@ -592,7 +619,7 @@ export class BookingService {
   private async cleanupExpiredBooking(bookingId: string): Promise<void> {
     try {
       const booking = await this.bookingRepository.findOne({
-        where: { id: bookingId, paymentStatus: false },
+        where: { id: bookingId, status: BookingStatus.PENDING_PAYMENT },
       });
 
       if (booking) {

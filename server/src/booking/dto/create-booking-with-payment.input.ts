@@ -1,8 +1,8 @@
-import { Field, InputType, ID } from '@nestjs/graphql';
-import { IsNotEmpty, IsDateString, IsUUID } from 'class-validator';
+import { InputType, Field, ID } from '@nestjs/graphql';
+import { IsNotEmpty, IsUUID, IsDateString } from 'class-validator';
 
 @InputType()
-export class CreateBookingInput {
+export class CreateBookingWithPaymentInput {
   @Field(() => ID)
   @IsNotEmpty()
   @IsUUID()
