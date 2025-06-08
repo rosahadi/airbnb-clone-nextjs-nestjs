@@ -332,6 +332,10 @@ export class BookingService {
         relations: ['property', 'user'],
         select: {
           id: true,
+          subTotal: true,
+          cleaning: true,
+          service: true,
+          tax: true,
           orderTotal: true,
           totalNights: true,
           checkIn: true,
@@ -343,8 +347,17 @@ export class BookingService {
           property: {
             id: true,
             name: true,
+            tagline: true,
+            category: true,
+            image: true,
             price: true,
             country: true,
+            description: true,
+            guests: true,
+            bedrooms: true,
+            beds: true,
+            baths: true,
+            amenities: true,
           },
           user: {
             id: true,
