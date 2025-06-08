@@ -123,3 +123,14 @@ export const DELETE_PROPERTY_MUTATION = gql`
     }
   }
 `;
+
+export const SEARCH_PROPERTIES_QUERY = gql`
+  ${PROPERTY_BASIC_FIELDS}
+  query SearchProperties(
+    $searchInput: PropertySearchInput
+  ) {
+    searchProperties(searchInput: $searchInput) {
+      ...PropertyBasicFields
+    }
+  }
+`;

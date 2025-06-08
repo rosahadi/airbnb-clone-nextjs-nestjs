@@ -2,6 +2,7 @@ import {
   propertyFilterSchema,
   propertyIdSchema,
   propertySchema,
+  propertySearchSchema,
   updatePropertySchema,
 } from "@/schema/property";
 import { z } from "zod";
@@ -60,6 +61,10 @@ export type PropertyIdParams = z.infer<
   typeof propertyIdSchema
 >;
 
+export type PropertySearchData = z.infer<
+  typeof propertySearchSchema
+>;
+
 export type PropertyFormUnion =
   | PropertyFormData
   | UpdatePropertyFormData;
@@ -82,4 +87,12 @@ export interface PropertyError {
 
 export interface PropertyFilterError {
   category?: string;
+}
+
+export interface PropertySearchError {
+  general?: string;
+  country?: string;
+  checkIn?: string;
+  checkOut?: string;
+  guests?: string;
 }
