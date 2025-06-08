@@ -14,13 +14,17 @@ export function AuthProvider({
     setIsAuthenticated,
     setIsLoading,
     isAuthenticated,
+    reset,
   } = useAuthStore();
 
-  const { data, loading } = useQuery(GET_CURRENT_USER, {
-    fetchPolicy: "network-only",
-    errorPolicy: "all",
-    skip: !isAuthenticated,
-  });
+  const { data, loading, error } = useQuery(
+    GET_CURRENT_USER,
+    {
+      fetchPolicy: "network-only",
+      errorPolicy: "all",
+      skip: !isAuthenticated,
+    }
+  );
 
   useEffect(() => {
     setIsLoading(loading);
@@ -29,18 +33,23 @@ export function AuthProvider({
     if (data?.me) {
       setUser(data.me);
       setIsAuthenticated(true);
-    } else if (!loading) {
-      // If we're not loading and don't have user data,
-      // we're not authenticated
-      setUser(null);
-      setIsAuthenticated(false);
+      return;
+    }
+
+    if (!loading && isAuthenticated) {
+      if (error || !data?.me) {
+        reset();
+      }
     }
   }, [
     data,
     loading,
+    error,
+    isAuthenticated,
     setUser,
     setIsAuthenticated,
     setIsLoading,
+    reset,
   ]);
 
   return <>{children}</>;
