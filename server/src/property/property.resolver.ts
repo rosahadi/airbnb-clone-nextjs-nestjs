@@ -9,19 +9,28 @@ import { Public } from '../auth/decorators/public.decorator';
 import { CreatePropertyInput } from './dto/create-property.input';
 import { UpdatePropertyInput } from './dto/update-property.input';
 import { PropertyFilterInput } from './dto/property-filter.input';
+import { PropertySearchInput } from './dto/property-search.input';
 
 @Resolver(() => Property)
 export class PropertyResolver {
   constructor(private readonly propertyService: PropertyService) {}
 
   // ---- Public Queries ----
-
   @Public()
   @Query(() => [Property])
   async properties(
     @Args('filters', { nullable: true }) filters?: PropertyFilterInput,
   ): Promise<Property[]> {
     return this.propertyService.findAllProperties(filters);
+  }
+
+  @Public()
+  @Query(() => [Property])
+  async searchProperties(
+    @Args('searchInput', { nullable: true }) searchInput?: PropertySearchInput,
+  ): Promise<Property[]> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return this.propertyService.searchProperties(searchInput);
   }
 
   @Public()
@@ -33,7 +42,6 @@ export class PropertyResolver {
   }
 
   // ---- Authenticated Queries ----
-
   @Query(() => [Property])
   @UseGuards(VerifiedEmailGuard)
   async myProperties(@CurrentUser() user: User): Promise<Property[]> {
@@ -41,7 +49,6 @@ export class PropertyResolver {
   }
 
   // ---- Mutations ----
-
   @Mutation(() => Property)
   @UseGuards(VerifiedEmailGuard)
   async createProperty(

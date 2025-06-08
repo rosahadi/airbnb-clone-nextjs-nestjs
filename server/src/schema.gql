@@ -166,6 +166,13 @@ type PropertyRatingDto {
   rating: Float!
 }
 
+input PropertySearchInput {
+  checkIn: String
+  checkOut: String
+  country: String
+  guests: Int
+}
+
 type Query {
   appStats: AppStatsDto!
   booking(id: ID!): Booking!
@@ -187,6 +194,7 @@ type Query {
   propertyReviews(propertyId: ID!): [Review!]!
   review(id: ID!): Review!
   reviews(filters: ReviewFilterInput): [Review!]!
+  searchProperties(searchInput: PropertySearchInput): [Property!]!
   user(id: ID!): User!
   users: [User!]!
 }

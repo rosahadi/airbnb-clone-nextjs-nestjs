@@ -8,19 +8,62 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 import { Property } from './entities/property.entity';
 import { User } from '../users/entities/user.entity';
+import { Booking, BookingStatus } from '../booking/booking.entity';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { CreatePropertyInput } from './dto/create-property.input';
 import { UpdatePropertyInput } from './dto/update-property.input';
 import { PropertyFilterInput } from './dto/property-filter.input';
+import { PropertySearchInput } from './dto/property-search.input';
 
 @Injectable()
 export class PropertyService {
   constructor(
     @InjectRepository(Property)
     private readonly propertyRepository: Repository<Property>,
+    @InjectRepository(Booking)
+    private readonly bookingRepository: Repository<Booking>,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
+  async searchProperties(
+    searchInput?: PropertySearchInput,
+  ): Promise<Property[]> {
+    const queryBuilder = this.propertyRepository.createQueryBuilder('property');
+
+    if (searchInput?.country) {
+      queryBuilder.andWhere('LOWER(property.country) LIKE LOWER(:country)', {
+        country: `%${searchInput.country}%`,
+      });
+    }
+
+    if (searchInput?.guests) {
+      queryBuilder.andWhere('property.guests >= :guests', {
+        guests: searchInput.guests,
+      });
+    }
+
+    if (searchInput?.checkIn && searchInput?.checkOut) {
+      const checkIn = new Date(searchInput.checkIn);
+      const checkOut = new Date(searchInput.checkOut);
+
+      const conflictingBookings = this.bookingRepository
+        .createQueryBuilder('booking')
+        .select('booking.propertyId')
+        .where('booking.status IN (:...statuses)', {
+          statuses: [BookingStatus.CONFIRMED, BookingStatus.PENDING_PAYMENT],
+        })
+        .andWhere('booking.checkIn <= :checkOut', { checkOut })
+        .andWhere('booking.checkOut >= :checkIn', { checkIn });
+
+      queryBuilder
+        .andWhere(`property.id NOT IN (${conflictingBookings.getQuery()})`)
+        .setParameters(conflictingBookings.getParameters());
+    }
+
+    queryBuilder.orderBy('property.createdAt', 'DESC');
+
+    return queryBuilder.getMany();
+  }
   async createProperty(
     user: User,
     createPropertyInput: CreatePropertyInput,
@@ -28,7 +71,6 @@ export class PropertyService {
     try {
       let imageUrl: string;
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const { image } = createPropertyInput;
 
       if (typeof image === 'string') {
