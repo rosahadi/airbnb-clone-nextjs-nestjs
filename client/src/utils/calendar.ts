@@ -1,11 +1,10 @@
 import { Booking } from "@/types/booking";
-import { DateRange } from "react-day-picker";
 import { formatDateForInput } from "./format";
 
-export const defaultSelected: DateRange = {
-  from: undefined,
-  to: undefined,
-};
+export const defaultSelected: [Date | null, Date | null] = [
+  null,
+  null,
+];
 
 export const generateBlockedPeriods = ({
   bookings,
@@ -13,51 +12,39 @@ export const generateBlockedPeriods = ({
 }: {
   bookings: Booking[];
   today: Date;
-}) => {
+}): [Date, Date][] => {
   const todayCopy = new Date(today);
   todayCopy.setHours(0, 0, 0, 0);
 
-  const disabledDays: DateRange[] = [
-    // Convert string dates to Date objects for bookings
-    // Only block the nights being stayed (checkIn to checkOut - 1 day)
-    ...bookings.map((booking) => {
+  const disabledDays: [Date, Date][] = [
+    ...bookings.map((booking): [Date, Date] => {
       const checkInDate = new Date(booking.checkIn);
       const checkOutDate = new Date(booking.checkOut);
-
-      // Block from check-in date to checkout date - 1 day
-      // This allows checkout day to be available for new checkins
       const blockEndDate = new Date(checkOutDate);
       blockEndDate.setDate(blockEndDate.getDate() - 1);
-
-      return {
-        from: checkInDate,
-        to: blockEndDate,
-      };
+      return [checkInDate, blockEndDate];
     }),
-    // Block all dates before today
-    {
-      from: new Date(0),
-      to: new Date(
-        todayCopy.getTime() - 24 * 60 * 60 * 1000
-      ),
-    },
+    [
+      new Date(0),
+      new Date(todayCopy.getTime() - 24 * 60 * 60 * 1000),
+    ],
   ];
+
   return disabledDays;
 };
 
 export const generateDateRange = (
-  range: DateRange | undefined
+  range: [Date | null, Date | null]
 ): string[] => {
-  if (!range || !range.from || !range.to) return [];
+  const [from, to] = range;
+  if (!from || !to) return [];
 
-  const currentDate = new Date(range.from);
-  const endDate = new Date(range.to);
+  const currentDate = new Date(from);
+  const endDate = new Date(to);
   const dateRange: string[] = [];
 
-  // Include check-in date but exclude check-out date
   while (currentDate < endDate) {
-    const dateString = formatDateForInput(currentDate);
-    dateRange.push(dateString);
+    dateRange.push(formatDateForInput(currentDate));
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
@@ -65,19 +52,15 @@ export const generateDateRange = (
 };
 
 export const generateDisabledDates = (
-  disabledDays: DateRange[]
+  disabledRanges: [Date, Date][]
 ): { [key: string]: boolean } => {
-  if (disabledDays.length === 0) return {};
-
   const disabledDates: { [key: string]: boolean } = {};
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  disabledDays.forEach((range) => {
-    if (!range.from || !range.to) return;
-
-    const currentDate = new Date(range.from);
-    const endDate = new Date(range.to);
+  disabledRanges.forEach(([from, to]) => {
+    const currentDate = new Date(from);
+    const endDate = new Date(to);
 
     while (currentDate <= endDate) {
       if (currentDate < today) {
@@ -103,22 +86,19 @@ export function calculateDaysBetween({
   const diffInMs = Math.abs(
     checkOut.getTime() - checkIn.getTime()
   );
-  const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-  return diffInDays;
+  return diffInMs / (1000 * 60 * 60 * 24);
 }
 
 export const isDateDisabled = (
   date: Date,
-  disabledRanges: DateRange[]
+  disabledRanges: [Date, Date][]
 ): boolean => {
   const targetDate = new Date(date);
   targetDate.setHours(0, 0, 0, 0);
 
-  return disabledRanges.some((range) => {
-    if (!range.from || !range.to) return false;
-
-    const fromDate = new Date(range.from);
-    const toDate = new Date(range.to);
+  return disabledRanges.some(([from, to]) => {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
     fromDate.setHours(0, 0, 0, 0);
     toDate.setHours(0, 0, 0, 0);
 
@@ -130,8 +110,8 @@ export const getAvailableDateRanges = (
   startDate: Date,
   endDate: Date,
   bookings: Booking[]
-): DateRange[] => {
-  const availableRanges: DateRange[] = [];
+): [Date, Date][] => {
+  const availableRanges: [Date, Date][] = [];
 
   const sortedBookings = bookings
     .map((booking) => ({
@@ -146,12 +126,12 @@ export const getAvailableDateRanges = (
 
   for (const booking of sortedBookings) {
     if (currentStart < booking.checkIn) {
-      availableRanges.push({
-        from: new Date(currentStart),
-        to: new Date(
+      availableRanges.push([
+        new Date(currentStart),
+        new Date(
           booking.checkIn.getTime() - 24 * 60 * 60 * 1000
         ),
-      });
+      ]);
     }
     currentStart = new Date(
       Math.max(
@@ -162,42 +142,43 @@ export const getAvailableDateRanges = (
   }
 
   if (currentStart < endDate) {
-    availableRanges.push({
-      from: new Date(currentStart),
-      to: new Date(endDate),
-    });
+    availableRanges.push([
+      new Date(currentStart),
+      new Date(endDate),
+    ]);
   }
 
   return availableRanges;
 };
 
 export const formatDateRange = (
-  range: DateRange
+  range: [Date | null, Date | null]
 ): string => {
-  if (!range.from) return "";
+  const [from, to] = range;
+  if (!from) return "";
 
-  const fromStr = range.from.toLocaleDateString();
-  const toStr = range.to
-    ? range.to.toLocaleDateString()
-    : "";
+  const fromStr = from.toLocaleDateString();
+  const toStr = to ? to.toLocaleDateString() : "";
 
   return toStr ? `${fromStr} - ${toStr}` : fromStr;
 };
 
 export const validateDateRange = (
-  range: DateRange
+  range: [Date | null, Date | null]
 ): {
   isValid: boolean;
   error?: string;
 } => {
-  if (!range.from) {
+  const [from, to] = range;
+
+  if (!from) {
     return {
       isValid: false,
       error: "Check-in date is required",
     };
   }
 
-  if (!range.to) {
+  if (!to) {
     return {
       isValid: false,
       error: "Check-out date is required",
@@ -207,14 +188,14 @@ export const validateDateRange = (
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  if (range.from < today) {
+  if (from < today) {
     return {
       isValid: false,
       error: "Check-in date cannot be in the past",
     };
   }
 
-  if (range.to <= range.from) {
+  if (to <= from) {
     return {
       isValid: false,
       error: "Check-out date must be after check-in date",
