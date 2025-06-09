@@ -1,6 +1,6 @@
 FROM node:23-slim
 
-WORKDIR /app
+WORKDIR /server
 
 COPY package*.json ./
 RUN npm ci
