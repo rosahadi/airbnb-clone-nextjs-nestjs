@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { Booking } from '../booking/booking.entity';
 import { TypedConfigService } from '../config/typed-config.service';
 import { EmailConfig } from '../config/email.config';

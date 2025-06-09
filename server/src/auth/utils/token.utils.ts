@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/user.entity';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

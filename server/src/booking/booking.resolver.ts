@@ -2,7 +2,7 @@ import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { Booking } from './booking.entity';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { VerifiedEmailGuard } from '../auth/guards/verified-email.guard';
 import { CreateBookingWithPaymentInput } from './dto/create-booking-with-payment.input';

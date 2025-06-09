@@ -4,7 +4,6 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { Role } from '../../users/role.enum';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Request } from 'express';
-import { User } from 'src/users/entities/user.entity';
 
 interface GqlContext {
   req: Request;
@@ -28,7 +27,7 @@ export class RolesGuard implements CanActivate {
     const gqlContext = ctx.getContext<GqlContext>();
 
     const req = gqlContext.req;
-    const user = req.user as User | undefined;
+    const user = req.user;
 
     if (!user) {
       return false;

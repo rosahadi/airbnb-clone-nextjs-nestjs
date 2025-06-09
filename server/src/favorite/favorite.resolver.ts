@@ -2,7 +2,7 @@ import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { FavoriteService } from './favorite.service';
 import { Favorite } from './favorite.entity';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { VerifiedEmailGuard } from '../auth/guards/verified-email.guard';
 import { FavoriteStatusResponse } from './dto/favorite-status.response';

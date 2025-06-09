@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Favorite } from './favorite.entity';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { PropertyService } from '../property/property.service';
 import { FavoriteStatusResponse } from './dto/favorite-status.response';
 

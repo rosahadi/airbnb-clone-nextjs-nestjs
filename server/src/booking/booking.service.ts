@@ -7,8 +7,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository, LessThan } from 'typeorm';
 import { Booking, BookingStatus } from './booking.entity';
-import { Property } from '../property/entities/property.entity';
-import { User } from '../users/entities/user.entity';
+import { Property } from '../property/property.entity';
+import { User } from '../users/user.entity';
 import { StripeService } from '../stripe/stripe.service';
 import { EmailService } from '../email/email.service';
 import { CreateBookingWithPaymentInput } from './dto/create-booking-with-payment.input';

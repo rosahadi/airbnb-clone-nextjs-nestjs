@@ -8,7 +8,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/users/user.entity';
 import { Favorite } from 'src/favorite/favorite.entity';
 import { Review } from 'src/review/review.entity';
 import { Booking } from 'src/booking/booking.entity';

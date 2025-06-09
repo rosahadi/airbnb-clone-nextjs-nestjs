@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { Property } from 'src/property/entities/property.entity';
+import { User } from 'src/users/user.entity';
+import { Property } from 'src/property/property.entity';
 
 @ObjectType()
 @Entity()

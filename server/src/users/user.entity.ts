@@ -7,9 +7,9 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Role } from '../role.enum';
+import { Role } from './role.enum';
 import * as crypto from 'crypto';
-import { Property } from 'src/property/entities/property.entity';
+import { Property } from 'src/property/property.entity';
 import { Favorite } from 'src/favorite/favorite.entity';
 import { Review } from 'src/review/review.entity';
 import { Booking } from 'src/booking/booking.entity';

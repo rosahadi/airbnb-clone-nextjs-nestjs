@@ -7,7 +7,7 @@ import { ForgotPasswordInput } from './dto/forgot-password.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
 import { UpdatePasswordInput } from './dto/update-password.input';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { Public } from './decorators/public.decorator';
 import { SignupResponse } from './dto/signup-response.dto';
 import { TokenUtils } from './utils/token.utils';

@@ -11,7 +11,7 @@ import { LoginInput } from './dto/login.input';
 import { UpdatePasswordInput } from './dto/update-password.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
 import { EmailService } from '../email/email.service';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { PasswordService } from './password.service';
 import { TokenUtils } from './utils/token.utils';
 

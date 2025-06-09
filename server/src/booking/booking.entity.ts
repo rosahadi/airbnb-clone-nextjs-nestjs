@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
   JoinColumn,
 } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { Property } from 'src/property/entities/property.entity';
+import { User } from 'src/users/user.entity';
+import { Property } from 'src/property/property.entity';
 
 export enum BookingStatus {
   PENDING_PAYMENT = 'pending_payment',

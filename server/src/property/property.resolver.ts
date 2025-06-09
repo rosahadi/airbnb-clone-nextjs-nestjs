@@ -1,8 +1,8 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { PropertyService } from './property.service';
-import { Property } from './entities/property.entity';
-import { User } from '../users/entities/user.entity';
+import { Property } from './property.entity';
+import { User } from '../users/user.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { VerifiedEmailGuard } from '../auth/guards/verified-email.guard';
 import { Public } from '../auth/decorators/public.decorator';

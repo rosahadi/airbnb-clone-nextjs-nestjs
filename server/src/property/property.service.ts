@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
-import { Property } from './entities/property.entity';
-import { User } from '../users/entities/user.entity';
+import { Property } from './property.entity';
+import { User } from '../users/user.entity';
 import { Booking, BookingStatus } from '../booking/booking.entity';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { CreatePropertyInput } from './dto/create-property.input';
