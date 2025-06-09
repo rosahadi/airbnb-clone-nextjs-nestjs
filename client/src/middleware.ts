@@ -6,6 +6,8 @@ const publicPaths = [
   "/",
   "/properties",
   "/properties/[id]",
+  "/verify-email",
+  "/reset-password",
 ];
 
 export function middleware(request: NextRequest) {
