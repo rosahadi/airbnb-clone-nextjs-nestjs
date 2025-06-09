@@ -7,7 +7,10 @@ import { Suspense } from "react";
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: { category?: string; search?: string };
+  searchParams: Promise<{
+    category?: string;
+    search?: string;
+  }>;
 }) {
   const params = await searchParams;
   const category = params.category || undefined;
