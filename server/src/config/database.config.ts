@@ -11,5 +11,13 @@ export const typeOrmConfig = registerAs(
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     synchronize: Boolean(process.env.DB_SYNC ?? false),
+
+    // SSL configuration for Neon
+    ssl:
+      process.env.NODE_ENV === 'production'
+        ? {
+            rejectUnauthorized: false,
+          }
+        : false,
   }),
 );

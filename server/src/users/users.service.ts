@@ -113,12 +113,4 @@ export class UsersService {
     });
     return user ?? undefined;
   }
-
-  async compareUserPassword(
-    userId: string,
-    password: string,
-  ): Promise<boolean> {
-    const user = await this.findById(userId);
-    return this.passwordService.verify(password, user.password);
-  }
 }
