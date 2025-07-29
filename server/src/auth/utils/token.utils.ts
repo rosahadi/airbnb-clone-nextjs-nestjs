@@ -13,11 +13,14 @@ export class TokenUtils {
       10,
     );
 
+    const isProduction = this.configService.get('NODE_ENV') === 'production';
+
     const cookieOptions = {
       expires: new Date(Date.now() + cookieExpiresInDays * 24 * 60 * 60 * 1000),
       httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      path: '/', // this ensures cookie is sent with all requests
+      secure: isProduction,
+      sameSite: isProduction ? ('none' as const) : ('lax' as const),
+      path: '/',
     };
 
     // Set the cookie with the token

@@ -108,10 +108,13 @@ export class AuthResolver {
   @Mutation(() => Boolean)
   // eslint-disable-next-line @typescript-eslint/require-await
   async logout(@Context() context: GqlContext): Promise<boolean> {
+    const isProduction = process.env.NODE_ENV === 'production';
+
     // Clear the cookie with secure options
     context.res.clearCookie('airbnbCloneJWT', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
     });
     return true;
