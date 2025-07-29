@@ -1,19 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { User } from '../../users/user.entity';
-import { ConfigService } from '@nestjs/config';
+import { TypedConfigService } from 'src/config/typed-config.service';
+import { AuthConfig } from 'src/config/auth.config';
 
 @Injectable()
 export class TokenUtils {
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: TypedConfigService) {}
 
   setCookieToken(res: Response, token: string): void {
-    const cookieExpiresInDays = parseInt(
-      this.configService.get('JWT_COOKIE_EXPIRES_IN') || '7',
-      10,
-    );
+    const authConfig = this.configService.get<AuthConfig>('auth');
 
-    const isProduction = this.configService.get('NODE_ENV') === 'production';
+    if (!authConfig) {
+      throw new Error('Auth config not found');
+    }
+
+    const cookieExpiresInDays = authConfig.jwt.cookieExpiresIn;
+    const isProduction = authConfig.nodeEnv === 'production';
+
+    console.log('🍪 Setting cookie - NODE_ENV:', authConfig.nodeEnv);
+    console.log('🍪 Is production:', isProduction);
+    console.log('🍪 Cookie expires in days:', cookieExpiresInDays);
 
     const cookieOptions = {
       expires: new Date(Date.now() + cookieExpiresInDays * 24 * 60 * 60 * 1000),
@@ -23,8 +30,12 @@ export class TokenUtils {
       path: '/',
     };
 
+    console.log('🍪 Cookie options:', cookieOptions);
+
     // Set the cookie with the token
     res.cookie('airbnbCloneJWT', token, cookieOptions);
+
+    console.log('🍪 Cookie set successfully');
   }
 
   createSendToken(
