@@ -118,7 +118,7 @@ export class AuthResolver {
     context.res.clearCookie('airbnbCloneJWT', {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: 'none' as const,
       path: '/',
     });
     return true;

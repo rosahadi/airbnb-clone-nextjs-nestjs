@@ -10,7 +10,6 @@ const getGraphQLUrl = () => {
   const url =
     process.env.NEXT_PUBLIC_API_URL ??
     "http://localhost:4000/graphql";
-  console.log("GraphQL URL:", url);
   return url;
 };
 
