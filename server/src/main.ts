@@ -19,7 +19,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       disableErrorMessages: false,
       exceptionFactory: (errors) => {
-        console.log('Validation errors:', errors);
         return new BadRequestException(errors);
       },
     }),
@@ -38,6 +37,7 @@ async function bootstrap() {
       'Accept',
       'Origin',
       'X-Requested-With',
+      'Cookie',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     exposedHeaders: ['Set-Cookie'],

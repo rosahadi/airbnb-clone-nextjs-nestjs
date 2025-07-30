@@ -18,10 +18,6 @@ export class TokenUtils {
     const cookieExpiresInDays = authConfig.jwt.cookieExpiresIn;
     const isProduction = authConfig.nodeEnv === 'production';
 
-    console.log('🍪 Setting cookie - NODE_ENV:', authConfig.nodeEnv);
-    console.log('🍪 Is production:', isProduction);
-    console.log('🍪 Cookie expires in days:', cookieExpiresInDays);
-
     const cookieOptions = {
       expires: new Date(Date.now() + cookieExpiresInDays * 24 * 60 * 60 * 1000),
       httpOnly: true,
@@ -30,12 +26,8 @@ export class TokenUtils {
       path: '/',
     };
 
-    console.log('🍪 Cookie options:', cookieOptions);
-
     // Set the cookie with the token
     res.cookie('airbnbCloneJWT', token, cookieOptions);
-
-    console.log('🍪 Cookie set successfully');
   }
 
   createSendToken(
