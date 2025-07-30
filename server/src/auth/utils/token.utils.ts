@@ -16,22 +16,27 @@ export class TokenUtils {
     }
 
     const cookieExpiresInDays = authConfig.jwt.cookieExpiresIn;
-    const isProduction = authConfig.nodeEnv === 'production';
+    // const isProduction = authConfig.nodeEnv === 'production';
 
     const cookieOptions = {
       expires: new Date(Date.now() + cookieExpiresInDays * 24 * 60 * 60 * 1000),
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? ('none' as const) : ('lax' as const),
+      secure: true,
+      sameSite: 'none' as const,
       path: '/',
-
-      ...(isProduction && {
-        domain: undefined,
-      }),
     };
 
     // Set the cookie with the token
     res.cookie('airbnbCloneJWT', token, cookieOptions);
+
+    // debug header
+    res.setHeader(
+      'X-Set-Cookie-Debug',
+      `airbnbCloneJWT=${token}; ${Object.entries(cookieOptions)
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        .map(([k, v]) => `${k}=${v}`)
+        .join('; ')}`,
+    );
   }
 
   createSendToken(

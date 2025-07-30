@@ -32,10 +32,8 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       clientUrl,
-
       'http://localhost:3000',
       'http://localhost:3001',
-
       /^https:\/\/.*\.vercel\.app$/,
     ],
     credentials: true,
@@ -46,9 +44,11 @@ async function bootstrap() {
       'Origin',
       'X-Requested-With',
       'Cookie',
+      'Set-Cookie',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    exposedHeaders: ['Set-Cookie'],
+    exposedHeaders: ['Set-Cookie', 'X-Set-Cookie-Debug'],
+    optionsSuccessStatus: 200,
   });
 
   const expressApp = app.getHttpAdapter().getInstance() as Express;
