@@ -22,8 +22,12 @@ export class TokenUtils {
       expires: new Date(Date.now() + cookieExpiresInDays * 24 * 60 * 60 * 1000),
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'none' as const,
+      sameSite: isProduction ? ('none' as const) : ('lax' as const),
       path: '/',
+
+      ...(isProduction && {
+        domain: undefined,
+      }),
     };
 
     // Set the cookie with the token
