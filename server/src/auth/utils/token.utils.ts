@@ -1,23 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { User } from '../../users/user.entity';
-import { ConfigService } from '@nestjs/config';
+import { TypedConfigService } from 'src/config/typed-config.service';
+import { AuthConfig } from 'src/config/auth.config';
 
 @Injectable()
 export class TokenUtils {
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: TypedConfigService) {}
 
   setCookieToken(res: Response, token: string): void {
-    const cookieExpiresInDays = parseInt(
-      this.configService.get('JWT_COOKIE_EXPIRES_IN') || '7',
-      10,
-    );
+    const authConfig = this.configService.get<AuthConfig>('auth');
+
+    if (!authConfig) {
+      throw new Error('Auth config not found');
+    }
+
+    const cookieExpiresInDays = authConfig.jwt.cookieExpiresIn;
+    const isProduction = authConfig.nodeEnv === 'production';
 
     const cookieOptions = {
       expires: new Date(Date.now() + cookieExpiresInDays * 24 * 60 * 60 * 1000),
       httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      path: '/', // this ensures cookie is sent with all requests
+      secure: isProduction,
+      sameSite: 'none' as const,
+      path: '/',
     };
 
     // Set the cookie with the token

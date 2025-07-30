@@ -237,7 +237,6 @@ export class BookingService {
 
       if (expiredBookings.length > 0) {
         await this.bookingRepository.remove(expiredBookings);
-        console.log(`Cleaned up ${expiredBookings.length} expired bookings`);
       }
     } catch (error) {
       console.error('Error cleaning up expired bookings:', error);

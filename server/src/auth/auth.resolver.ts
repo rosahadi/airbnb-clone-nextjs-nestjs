@@ -14,6 +14,8 @@ import { TokenUtils } from './utils/token.utils';
 import { Request, Response } from 'express';
 import { UseGuards } from '@nestjs/common';
 import { VerifiedEmailGuard } from './guards/verified-email.guard';
+import { AuthConfig } from 'src/config/auth.config';
+import { TypedConfigService } from 'src/config/typed-config.service';
 
 export interface GqlContext {
   req: Request;
@@ -25,6 +27,7 @@ export class AuthResolver {
   constructor(
     private readonly authService: AuthService,
     private readonly tokenUtils: TokenUtils,
+    private configService: TypedConfigService,
   ) {}
 
   @Public()
@@ -108,10 +111,14 @@ export class AuthResolver {
   @Mutation(() => Boolean)
   // eslint-disable-next-line @typescript-eslint/require-await
   async logout(@Context() context: GqlContext): Promise<boolean> {
-    // Clear the cookie with secure options
+    const authConfig = this.configService.get<AuthConfig>('auth');
+    const isProduction = authConfig?.nodeEnv === 'production';
+
+    // Clear the cookie with same options as when setting
     context.res.clearCookie('airbnbCloneJWT', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
+      sameSite: 'none' as const,
       path: '/',
     });
     return true;

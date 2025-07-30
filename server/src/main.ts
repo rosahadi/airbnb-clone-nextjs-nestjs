@@ -19,7 +19,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       disableErrorMessages: false,
       exceptionFactory: (errors) => {
-        console.log('Validation errors:', errors);
         return new BadRequestException(errors);
       },
     }),
@@ -32,6 +31,16 @@ async function bootstrap() {
   app.enableCors({
     origin: clientUrl,
     credentials: true,
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'Origin',
+      'X-Requested-With',
+      'Cookie',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    exposedHeaders: ['Set-Cookie'],
   });
 
   await app.listen(process.env.PORT ?? 3000);
